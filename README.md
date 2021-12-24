@@ -10,6 +10,31 @@ This extension provides a [SwiftMailer](https://swiftmailer.symfony.com/) mail s
 
 For license information check the [LICENSE](LICENSE.md)-file.
 
+[![Latest Stable Version](https://poser.pugx.org/yiisoft/yii2-symfonymailer/v/stable.png)](https://packagist.org/packages/yiisoft/yii2-symfonymailer)
+[![Total Downloads](https://poser.pugx.org/yiisoft/yii2-symfonymailer/downloads.png)](https://packagist.org/packages/yiisoft/yii2-symfonymailer)
+[![Build Status](https://github.com/yiisoft/yii2-symfonymailer/workflows/build/badge.svg)](https://github.com/yiisoft/yii2-symfonymailer/actions)
+
+Installation
+------------
+
+The preferred way to install this extension is through [composer](http://getcomposer.org/download/).
+
+Either run
+
+```
+php composer.phar require --prefer-dist yiisoft/yii2-symfonymailer
+```
+
+or add
+
+```json
+"yiisoft/yii2-symfonymailer": "~2.0.0"
+```
+
+to the require section of your composer.json.
+
+> Note: Version 2.0 of this extension uses Symfonymailer, which requires PHP 8.
+
 Usage
 -----
 

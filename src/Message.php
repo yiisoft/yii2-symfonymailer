@@ -190,9 +190,8 @@ final class Message extends BaseMessage
             $file['contentType'] = mime_content_type($fileName);
         }
 
-        $new = clone $this;
-        $new->email->attachFromPath($fileName, $file['name'], $file['contentType']);
-        return $new;
+        $this->email->attachFromPath($fileName, $file['name'], $file['contentType']);
+        return $this;
     }
 
     /**
@@ -213,9 +212,8 @@ final class Message extends BaseMessage
             $file['contentType'] = null;
         }
 
-        $new = clone $this;
-        $new->email->attach($content, $file['name'], $file['contentType']);
-        return $new;
+        $this->email->attach($content, $file['name'], $file['contentType']);
+        return $this;
     }
 
     /**
@@ -236,9 +234,8 @@ final class Message extends BaseMessage
             $file['contentType'] = mime_content_type($fileName);
         }
 
-        $new = clone $this;
-        $new->email->embedFromPath($fileName, $file['name'], $file['contentType']);
-        return $new;
+        $this->email->embedFromPath($fileName, $file['name'], $file['contentType']);
+        return $this;
     }
 
     /**
@@ -259,15 +256,13 @@ final class Message extends BaseMessage
             $file['contentType'] = null;
         }
 
-        $new = clone $this;
-        $new->email->embed($content, $file['name'], $file['contentType']);
-        return $new;
+        $this->email->embed($content, $file['name'], $file['contentType']);
+        return $this;
     }
 
     public function getHeader(string $name): array
     {
         $headers = $this->email->getHeaders();
-
         if (!$headers->has($name)) {
             return [];
         }
@@ -282,17 +277,15 @@ final class Message extends BaseMessage
         return $values;
     }
 
-    public function setAddedHeader(string $name, string $value): self
+    public function addHeader(string $name, string $value): self
     {
-        $new = clone $this;
-        $new->email->getHeaders()->addTextHeader($name, $value);
-        return $new;
+        $this->email->getHeaders()->addTextHeader($name, $value);
+        return $this;
     }
 
     public function setHeader(string $name, $value): self
     {
-        $new = clone $this;
-        $headers = $new->email->getHeaders();
+        $headers = $this->email->getHeaders();
 
         if ($headers->has($name)) {
             $headers->remove($name);
@@ -302,30 +295,16 @@ final class Message extends BaseMessage
             $headers->addTextHeader($name, $v);
         }
 
-        return $new;
+        return $this;
     }
 
     public function setHeaders(array $headers): self
     {
-        $new = clone $this;
-
         foreach ($headers as $name => $value) {
-            $new = $new->withHeader($name, $value);
+            $this->setHeader($name, $value);
         }
 
-        return $new;
-    }
-
-    public function getError(): ?Throwable
-    {
-        return $this->error;
-    }
-
-    public function setError(Throwable $e): self
-    {
-        $new = clone $this;
-        $new->error = $e;
-        return $new;
+        return $this;
     }
 
     public function toString(): string

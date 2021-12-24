@@ -1,7 +1,14 @@
 {
     "name": "yiisoft/yii2-symfonymailer",
     "description": "The SymfonyMailer integration for the Yii framework",
-    "keywords": ["yii2", "symfony", "symfonymailer", "mail", "email", "mailer"],
+    "keywords": [
+        "yii2",
+        "symfony",
+        "symfonymailer",
+        "mail",
+        "email",
+        "mailer"
+    ],
     "type": "yii2-extension",
     "license": "BSD-3-Clause",
     "support": {
@@ -18,8 +25,12 @@
         }
     ],
     "require": {
+        "php": ">=8.0.2",
         "yiisoft/yii2": ">=2.0.4",
         "symfony/mailer": "~6.0.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "9.5.10"
     },
     "repositories": [
         {
@@ -28,7 +39,9 @@
         }
     ],
     "autoload": {
-        "psr-4": { "yii\\symfonymailer\\": "src" }
+        "psr-4": {
+            "yii\\symfonymailer\\": "src"
+        }
     },
     "extra": {
         "branch-alias": {
