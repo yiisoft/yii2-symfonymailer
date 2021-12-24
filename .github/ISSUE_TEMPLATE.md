@@ -15,7 +15,7 @@ Yii communities listed at https://github.com/yiisoft/yii2/wiki/communities
 | Q                       | A
 | ----------------------- | ---
 | Yii version             |
-| Yii SwiftMailer version |
-| SwiftMailer version     |
+| Yii SymfonyMailer version |
+| SymfonyMailer version     |
 | PHP version             |
 | Operating system        |
