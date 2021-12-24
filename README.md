@@ -44,8 +44,8 @@ To use this extension,  simply add the following code in your application config
 return [
     //....
     'components' => [
-            'mailer' => [
-            'class' => \app\components\symfonymailer\Mailer::class,            
+        'mailer' => [
+            'class' => \yii\symfonymailer\Mailer::class,            
             'transport' => [
                 'scheme' => '',
                 'host' => '',
@@ -53,7 +53,7 @@ return [
                 'password' => '',
                 'port' => 465,
                 'options' => ['ssl' => true],
-            ]
+            ],
         ],
     ],
 ];
