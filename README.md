@@ -10,9 +10,9 @@ This extension provides a [SwiftMailer](https://swiftmailer.symfony.com/) mail s
 
 For license information check the [LICENSE](LICENSE.md)-file.
 
-[![Latest Stable Version](https://poser.pugx.org/yiisoft/yii2-swiftmailer/v/stable.png)](https://packagist.org/packages/yiisoft/yii2-swiftmailer)
-[![Total Downloads](https://poser.pugx.org/yiisoft/yii2-swiftmailer/downloads.png)](https://packagist.org/packages/yiisoft/yii2-swiftmailer)
-[![Build Status](https://github.com/yiisoft/yii2-swiftmailer/workflows/build/badge.svg)](https://github.com/yiisoft/yii2-swiftmailer/actions)
+[![Latest Stable Version](https://poser.pugx.org/yiisoft/yii2-symfonymailer/v/stable.png)](https://packagist.org/packages/yiisoft/yii2-symfonymailer)
+[![Total Downloads](https://poser.pugx.org/yiisoft/yii2-symfonymailer/downloads.png)](https://packagist.org/packages/yiisoft/yii2-symfonymailer)
+[![Build Status](https://github.com/yiisoft/yii2-symfonymailer/workflows/build/badge.svg)](https://github.com/yiisoft/yii2-symfonymailer/actions)
 
 Installation
 ------------
