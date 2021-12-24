@@ -33,7 +33,7 @@ or add
 
 to the require section of your composer.json.
 
-> Note: Version 2.0 of this extensions uses Symfonymailer, which requires PHP 8.
+> Note: Version 2.0 of this extension uses Symfonymailer, which requires PHP 8.
 
 Usage
 -----
