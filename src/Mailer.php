@@ -32,7 +32,10 @@ final class Mailer extends BaseMailer
     private $signer = null;
     private array $dkimSignerOptions = [];
 
-    private TransportInterface $_transport;
+    /**
+     * @var TransportInterface Symfony transport instance or its array configuration.
+     */
+    private array|TransportInterface $_transport = [];
 
     /**
      * Creates Symfony mailer instance.
@@ -63,17 +66,10 @@ final class Mailer extends BaseMailer
         if (!is_array($transport) && !is_object($transport)) {
             throw new InvalidConfigException('"' . get_class($this) . '::transport" should be either object or array, "' . gettype($transport) . '" given.');
         }
-        if(is_array($transport)) {
-            $this->_transport = (new Transport\Smtp\EsmtpTransportFactory())->create(new Dsn(
-                $transport['scheme'],
-                $transport['host'],
-                $transport['username'],
-                $transport['password'],
-                $transport['port'],
-                $transport['options'],
-            ));
-        } elseif($transport instanceof TransportInterface) {
+        if($transport instanceof TransportInterface) {
             $this->_transport = $transport;
+        } elseif(is_array($transport)) {
+            $this->_transport = $this->createTransport($transport);
         }
         $this->symfonyMailer = null;
     }
@@ -83,7 +79,33 @@ final class Mailer extends BaseMailer
      */
     public function getTransport(): TransportInterface
     {
+        if (!is_object($this->_transport)) {
+            $this->_transport = $this->createTransport($this->_transport);
+        }
         return $this->_transport;
+    }
+
+    protected function createTransport(array $config = []): TransportInterface
+    {
+        $defaultFactories = Transport::getDefaultFactories();
+        $transportObj = new Transport($defaultFactories);
+
+        if(key_exists('dsn', $config)) {
+            $transport = $transportObj->fromString($config['dsn']);
+        } elseif(key_exists('scheme', $config) && key_exists('host', $config)) {
+            $dsn = new Dsn(
+                $config['scheme'],
+                $config['host'],
+                $config['username'] ?? '',
+                $config['password'] ?? '',
+                $config['port'] ?? '',
+                $config['options'] ?? [],
+            );
+            $transport = $transportObj->fromDsnObject($dsn);
+        } else {
+            $transport = $transportObj->fromString('null://null');
+        }
+        return $transport;
     }
 
 
