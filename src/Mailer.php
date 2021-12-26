@@ -35,7 +35,7 @@ final class Mailer extends BaseMailer
     /**
      * @var TransportInterface Symfony transport instance or its array configuration.
      */
-    private array|TransportInterface $_transport = [];
+    private $_transport = [];
 
     /**
      * Creates Symfony mailer instance.
@@ -61,9 +61,9 @@ final class Mailer extends BaseMailer
      * @param array|TransportInterface $transport
      * @throws InvalidConfigException on invalid argument.
      */
-    public function setTransport(array|TransportInterface $transport)
+    public function setTransport($transport)
     {
-        if (!is_array($transport) && !is_object($transport)) {
+        if (!is_array($transport) && !$transport instanceof TransportInterface) {
             throw new InvalidConfigException('"' . get_class($this) . '::transport" should be either object or array, "' . gettype($transport) . '" given.');
         }
         if($transport instanceof TransportInterface) {
@@ -71,6 +71,7 @@ final class Mailer extends BaseMailer
         } elseif(is_array($transport)) {
             $this->_transport = $this->createTransport($transport);
         }
+        
         $this->symfonyMailer = null;
     }
 

@@ -13,7 +13,7 @@ jobs:
             fail-fast: false
             matrix:
                 os: [ubuntu-latest]
-                php: ['8.0']
+                php: ['7.4', '8.0']
 
         steps:
             - name: Install sendmail
@@ -35,12 +35,5 @@ jobs:
                   restore-keys: ${{ runner.os }}-composer-
             - name: Install dependencies
               run: composer update $DEFAULT_COMPOSER_FLAGS
-            - name: Run unit tests with coverage
-              run: vendor/bin/phpunit --verbose --coverage-clover=coverage.clover --colors=always
             - name: Run unit tests without coverage
               run: vendor/bin/phpunit --verbose --colors=always
-            - name: Upload code coverage
-              run: |
-                  wget https://scrutinizer-ci.com/ocular.phar
-                  php ocular.phar code-coverage:upload --format=php-clover coverage.clover
-              continue-on-error: true # if is fork
