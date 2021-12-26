@@ -70,9 +70,8 @@ final class Mailer extends BaseMailer
             $this->_transport = $transport;
         } elseif(is_array($transport)) {
             $this->_transport = $this->createTransport($transport);
-        } else {
-            
         }
+        
         $this->symfonyMailer = null;
     }
 
