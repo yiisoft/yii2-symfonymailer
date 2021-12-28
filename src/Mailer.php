@@ -38,6 +38,13 @@ final class Mailer extends BaseMailer
     private $_transport = [];
 
     /**
+     * @var bool whether to enable writing of the Mailer internal logs using Yii log mechanism.
+     * If enabled [[Logger]] plugin will be attached to the [[transport]] for this purpose.
+     * @see Logger
+     */
+    public bool $enableMailerLogging = false;
+
+    /**
      * Creates Symfony mailer instance.
      * @return SymfonyMailer mailer instance.
      */
@@ -71,7 +78,7 @@ final class Mailer extends BaseMailer
         } elseif(is_array($transport)) {
             $this->_transport = $this->createTransport($transport);
         }
-        
+
         $this->symfonyMailer = null;
     }
 
@@ -88,7 +95,17 @@ final class Mailer extends BaseMailer
 
     protected function createTransport(array $config = []): TransportInterface
     {
-        $defaultFactories = Transport::getDefaultFactories();
+        if (key_exists('enableMailerLogging', $config)) {
+            $this->enableMailerLogging = $config['enableMailerLogging'];
+            unset($config['enableMailerLogging']);
+        }
+
+        $logger = null;
+        if ($this->enableMailerLogging) {
+            $logger = new Logger();
+        }
+
+        $defaultFactories = Transport::getDefaultFactories(null, null, $logger);
         $transportObj = new Transport($defaultFactories);
 
         if(key_exists('dsn', $config)) {
@@ -166,7 +183,7 @@ final class Mailer extends BaseMailer
      *
      * @throws TransportExceptionInterface If sending failed.
      */
-    protected function sendMessage($message): void
+    protected function sendMessage($message): bool
     {
         if (!($message instanceof Message)) {
             throw new RuntimeException(sprintf(
@@ -187,6 +204,12 @@ final class Mailer extends BaseMailer
                 : $this->signer->sign($message)
             ;
         }
-        $this->getSymfonyMailer()->send($message);
+        try {
+            $this->getSymfonyMailer()->send($message);
+        } catch (\Exception $exception) {
+            Yii::getLogger()->log($exception->getMessage(), \yii\log\Logger::LEVEL_ERROR, __METHOD__);
+            return false;
+        }
+        return true;
     }
 }
