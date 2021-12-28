@@ -79,7 +79,7 @@ final class Mailer extends BaseMailer
         } elseif(is_array($transport)) {
             $this->_transport = $this->createTransport($transport);
         }
-        
+
         $this->symfonyMailer = null;
     }
 
@@ -184,7 +184,7 @@ final class Mailer extends BaseMailer
      *
      * @throws TransportExceptionInterface If sending failed.
      */
-    protected function sendMessage($message): void
+    protected function sendMessage($message): bool
     {
         if (!($message instanceof Message)) {
             throw new RuntimeException(sprintf(
@@ -209,6 +209,8 @@ final class Mailer extends BaseMailer
             $this->getSymfonyMailer()->send($message);
         } catch (\Exception $exception) {
             Yii::getLogger()->log($exception->getMessage(), \yii\log\Logger::LEVEL_ERROR, __METHOD__);
+            return false;
         }
+        return true;
     }
 }
