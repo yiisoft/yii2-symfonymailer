@@ -12,7 +12,6 @@ use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Crypto\DkimSigner;
 use Symfony\Component\Mime\Crypto\SMimeEncrypter;
 use Symfony\Component\Mime\Crypto\SMimeSigner;
-use Yii;
 use yii\base\InvalidConfigException;
 use yii\mail\BaseMailer;
 
@@ -80,7 +79,7 @@ final class Mailer extends BaseMailer
         } elseif(is_array($transport)) {
             $this->_transport = $this->createTransport($transport);
         }
-
+        
         $this->symfonyMailer = null;
     }
 
@@ -196,7 +195,6 @@ final class Mailer extends BaseMailer
         }
 
         $message = $message->getSymfonyEmail();
-
         if ($this->encryptor !== null) {
             $message = $this->encryptor->encrypt($message);
         }
