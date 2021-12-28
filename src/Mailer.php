@@ -41,7 +41,6 @@ final class Mailer extends BaseMailer
      * @var bool whether to enable writing of the Mailer internal logs using Yii log mechanism.
      * If enabled [[Logger]] plugin will be attached to the [[transport]] for this purpose.
      * @see Logger
-     * @since 2.0.4
      */
     public bool $enableMailerLogging = false;
 
@@ -96,13 +95,13 @@ final class Mailer extends BaseMailer
 
     protected function createTransport(array $config = []): TransportInterface
     {
-        if(key_exists('enableMailerLogging', $config)) {
+        if (key_exists('enableMailerLogging', $config)) {
             $this->enableMailerLogging = $config['enableMailerLogging'];
             unset($config['enableMailerLogging']);
         }
 
         $logger = null;
-        if($this->enableMailerLogging) {
+        if ($this->enableMailerLogging) {
             $logger = new Logger();
         }
 
