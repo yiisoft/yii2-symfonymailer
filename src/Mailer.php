@@ -12,6 +12,7 @@ use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Crypto\DkimSigner;
 use Symfony\Component\Mime\Crypto\SMimeEncrypter;
 use Symfony\Component\Mime\Crypto\SMimeSigner;
+use Yii;
 use yii\base\InvalidConfigException;
 use yii\mail\BaseMailer;
 
@@ -36,6 +37,14 @@ final class Mailer extends BaseMailer
      * @var TransportInterface Symfony transport instance or its array configuration.
      */
     private $_transport = [];
+
+    /**
+     * @var bool whether to enable writing of the Mailer internal logs using Yii log mechanism.
+     * If enabled [[Logger]] plugin will be attached to the [[transport]] for this purpose.
+     * @see Logger
+     * @since 2.0.4
+     */
+    public bool $enableMailerLogging = false;
 
     /**
      * Creates Symfony mailer instance.
@@ -71,7 +80,7 @@ final class Mailer extends BaseMailer
         } elseif(is_array($transport)) {
             $this->_transport = $this->createTransport($transport);
         }
-        
+
         $this->symfonyMailer = null;
     }
 
@@ -88,7 +97,17 @@ final class Mailer extends BaseMailer
 
     protected function createTransport(array $config = []): TransportInterface
     {
-        $defaultFactories = Transport::getDefaultFactories();
+        if(key_exists('enableMailerLogging', $config)) {
+            $this->enableMailerLogging = $config['enableMailerLogging'];
+            unset($config['enableMailerLogging']);
+        }
+
+        $logger = null;
+        if($this->enableMailerLogging) {
+            $logger = new Logger();
+        }
+
+        $defaultFactories = Transport::getDefaultFactories(null, null, $logger);
         $transportObj = new Transport($defaultFactories);
 
         if(key_exists('dsn', $config)) {
@@ -177,6 +196,7 @@ final class Mailer extends BaseMailer
         }
 
         $message = $message->getSymfonyEmail();
+
         if ($this->encryptor !== null) {
             $message = $this->encryptor->encrypt($message);
         }
@@ -187,6 +207,10 @@ final class Mailer extends BaseMailer
                 : $this->signer->sign($message)
             ;
         }
-        $this->getSymfonyMailer()->send($message);
+        try {
+            $sentMessage = $this->getSymfonyMailer()->send($message);
+        } catch (\Exception $exception) {
+            Yii::getLogger()->log($exception->getMessage(), \yii\log\Logger::LEVEL_ERROR, __METHOD__);
+        }
     }
 }
