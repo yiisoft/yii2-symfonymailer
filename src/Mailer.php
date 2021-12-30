@@ -1,6 +1,9 @@
 <?php
-
-declare(strict_types=1);
+/**
+ * @link http://www.yiiframework.com/
+ * @copyright Copyright (c) 2008 Yii Software LLC
+ * @license http://www.yiiframework.com/license/
+ */
 
 namespace yii\symfonymailer;
 
@@ -17,7 +20,6 @@ use yii\mail\BaseMailer;
 
 final class Mailer extends BaseMailer
 {
-
     /**
      * @var string message default class name.
      */
@@ -25,17 +27,16 @@ final class Mailer extends BaseMailer
 
     private ?SymfonyMailer $symfonyMailer = null;
     private ?SMimeEncrypter $encryptor = null;
-
     /**
      * @var DkimSigner|SMimeSigner|null
      */
     private $signer = null;
     private array $dkimSignerOptions = [];
-
     /**
      * @var TransportInterface Symfony transport instance or its array configuration.
      */
     private $_transport = [];
+
 
     /**
      * @var bool whether to enable writing of the Mailer internal logs using Yii log mechanism.
@@ -43,7 +44,6 @@ final class Mailer extends BaseMailer
      * @see Logger
      */
     public bool $enableMailerLogging = false;
-
     /**
      * Creates Symfony mailer instance.
      * @return SymfonyMailer mailer instance.

@@ -1,6 +1,9 @@
 <?php
-
-declare(strict_types=1);
+/**
+ * @link http://www.yiiframework.com/
+ * @copyright Copyright (c) 2008 Yii Software LLC
+ * @license http://www.yiiframework.com/license/
+ */
 
 namespace yii\symfonymailer;
 
@@ -127,7 +130,7 @@ final class Logger implements LoggerInterface
     /**
      * Logs with an arbitrary level.
      *
-     * @param mixed   $level
+     * @param mixed $level
      * @param string|\Stringable $message
      * @param mixed[] $context
      *
