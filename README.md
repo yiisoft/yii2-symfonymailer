@@ -58,6 +58,20 @@ return [
     ],
 ];
 ```
+or
+```php
+return [
+    //....
+    'components' => [
+        'mailer' => [
+            'class' => \yii\symfonymailer\Mailer::class,            
+            'transport' => [
+                'dsn' => 'smtp://user:pass@smtp.example.com:25',
+            ],
+        ],
+    ],
+];
+```
 
 You can then send an email as follows:
 

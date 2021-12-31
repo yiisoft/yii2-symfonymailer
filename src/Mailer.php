@@ -207,7 +207,7 @@ final class Mailer extends BaseMailer
         try {
             $this->getSymfonyMailer()->send($message);
         } catch (\Exception $exception) {
-            Yii::getLogger()->log($exception->getMessage(), \yii\log\Logger::LEVEL_ERROR, __METHOD__);
+            \Yii::getLogger()->log($exception->getMessage(), \yii\log\Logger::LEVEL_ERROR, __METHOD__);
             return false;
         }
         return true;
