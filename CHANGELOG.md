@@ -1,7 +1,7 @@
 Yii Framework 2 Symfony mailer extension Change Log
 ================================================
 
-2.0.1 under development
+2.0.1 December 31, 2021
 -----------------------
 
 - Bug #12: Fix namespace import in Mailer.php (Krakozaber)
