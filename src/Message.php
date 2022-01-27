@@ -237,7 +237,7 @@ final class Message extends BaseMessage
         }
 
         $this->email->embedFromPath($fileName, $file['name'], $file['contentType']);
-        return $this;
+        return 'cid:' . $file['name'];
     }
 
     /**
@@ -259,7 +259,7 @@ final class Message extends BaseMessage
         }
 
         $this->email->embed($content, $file['name'], $file['contentType']);
-        return $this;
+        return 'cid:' . $file['name'];
     }
 
     public function getHeader(string $name): array
