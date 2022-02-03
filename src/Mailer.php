@@ -38,6 +38,8 @@ final class Mailer extends BaseMailer
      * @var TransportInterface|array Symfony transport instance or its array configuration.
      */
     private $_transport = [];
+
+
     /**
      * @var bool whether to enable writing of the Mailer internal logs using Yii log mechanism.
      * If enabled [[Logger]] plugin will be attached to the [[transport]] for this purpose.

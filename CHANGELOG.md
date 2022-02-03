@@ -1,13 +1,14 @@
 Yii Framework 2 Symfony mailer extension Change Log
 ================================================
 
-2.0.2 under development
+2.0.2 February 03, 2022
 -----------------------
 
 - Bug #15: Fix return value of Message::embed() and Message::embedContent() (Hyncica)
 - Bug #17: Fix missing import for `\RuntimeException` in `Mailer` (samdark)
 - Bug #18: Fix `Message` incompatibility with `MessageInterface` (samdark)
 - Bug #18: Fix not calling `Message` constructor (samdark)
+
 
 2.0.1 December 31, 2021
 -----------------------
