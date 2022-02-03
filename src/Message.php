@@ -19,8 +19,9 @@ final class Message extends BaseMessage
 {
     private Email $email;
     private string $charset = 'utf-8';
-    public function __construct()
+    public function __construct($config = [])
     {
+        parent::__construct($config);
         $this->email = new Email();
     }
 
@@ -262,7 +263,7 @@ final class Message extends BaseMessage
         return 'cid:' . $file['name'];
     }
 
-    public function getHeader(string $name): array
+    public function getHeader($name): array
     {
         $headers = $this->email->getHeaders();
         if (!$headers->has($name)) {
@@ -279,13 +280,13 @@ final class Message extends BaseMessage
         return $values;
     }
 
-    public function addHeader(string $name, string $value): self
+    public function addHeader($name, $value): self
     {
         $this->email->getHeaders()->addTextHeader($name, $value);
         return $this;
     }
 
-    public function setHeader(string $name, $value): self
+    public function setHeader($name, $value): self
     {
         $headers = $this->email->getHeaders();
 
@@ -300,7 +301,7 @@ final class Message extends BaseMessage
         return $this;
     }
 
-    public function setHeaders(array $headers): self
+    public function setHeaders($headers): self
     {
         foreach ($headers as $name => $value) {
             $this->setHeader($name, $value);

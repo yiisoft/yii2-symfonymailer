@@ -140,29 +140,19 @@ final class Logger implements LoggerInterface
      */
     public function log($level, $message, array $context = []): void
     {
-        switch($level) {
+        switch ($level) {
+            case 'error':
+            case 'critical':
+            case 'alert':
             case 'emergency':
                 $level = \yii\log\Logger::LEVEL_ERROR;
                 break;
-            case 'alert':
-                $level = \yii\log\Logger::LEVEL_ERROR;
-                break;
-            case 'critical':
-                $level = \yii\log\Logger::LEVEL_ERROR;
-                break;
-            case 'error':
-                $level = \yii\log\Logger::LEVEL_ERROR;
-                break;
+            case 'notice':
             case 'warning':
                 $level = \yii\log\Logger::LEVEL_WARNING;
                 break;
-            case 'notice':
-                $level = \yii\log\Logger::LEVEL_WARNING;
-                break;
-            case 'info':
-                $level = \yii\log\Logger::LEVEL_INFO;
-                break;
             case 'debug':
+            case 'info':
                 $level = \yii\log\Logger::LEVEL_INFO;
                 break;
             default:
