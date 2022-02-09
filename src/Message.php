@@ -21,8 +21,8 @@ final class Message extends BaseMessage
     private string $charset = 'utf-8';
     public function __construct($config = [])
     {
-        parent::__construct($config);
         $this->email = new Email();
+        parent::__construct($config);        
     }
 
     public function __clone()
