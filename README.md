@@ -33,8 +33,6 @@ or add
 
 to the require section of your composer.json.
 
-> Note: Version 2.0 of this extension uses Symfonymailer, which requires PHP 8.
-
 Usage
 -----
 
@@ -47,12 +45,32 @@ return [
         'mailer' => [
             'class' => \yii\symfonymailer\Mailer::class,            
             'transport' => [
-                'scheme' => '',
+                'scheme' => 'smtps',
                 'host' => '',
                 'username' => '',
                 'password' => '',
-                'port' => 465,
-                'options' => ['ssl' => true],
+                //'port' => 465,
+                //'options' => ['ssl' => true],
+                'dsn' => 'native://default',
+            ],
+            'viewPath' => '@common/mail',
+            // send all mails to a file by default. You have to set
+			// 'useFileTransport' to false and configure transport
+			// for the mailer to send real emails.
+			'useFileTransport' => false,
+        ],
+    ],
+];
+```
+or
+```php
+return [
+    //....
+    'components' => [
+        'mailer' => [
+            'class' => \yii\symfonymailer\Mailer::class,            
+            'transport' => [
+                'dsn' => 'smtp://user:pass@smtp.example.com:25',
             ],
         ],
     ],

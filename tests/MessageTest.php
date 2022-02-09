@@ -260,6 +260,8 @@ class MessageTest extends TestCase
         $message = $this->createTestMessage();
 
         $cid = $message->embed($fileName);
+        $this->assertIsString($cid);
+        $this->assertStringStartsWith('cid:', $cid);
         $message->setTo($this->testEmailReceiver);
         $message->setFrom('someuser@somedomain.com');
         $message->setSubject('Yii Symfony Embed File Test');
@@ -286,6 +288,8 @@ class MessageTest extends TestCase
         $fileContent = file_get_contents($fileFullName);
 
         $cid = $message->embedContent($fileContent, ['fileName' => $fileName, 'contentType' => $contentType]);
+        $this->assertIsString($cid);
+        $this->assertStringStartsWith('cid:', $cid);
 
         $message->setTo($this->testEmailReceiver);
         $message->setFrom('someuser@somedomain.com');
