@@ -20,7 +20,7 @@ use Yii;
 use yii\base\InvalidConfigException;
 use yii\mail\BaseMailer;
 
-final class Mailer extends BaseMailer
+class Mailer extends BaseMailer
 {
     /**
      * @var string message default class name.
