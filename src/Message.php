@@ -15,7 +15,7 @@ use Symfony\Component\Mime\Header\HeaderInterface;
 use yii\mail\BaseMessage;
 
 
-final class Message extends BaseMessage
+class Message extends BaseMessage
 {
     private Email $email;
     private string $charset = 'utf-8';
