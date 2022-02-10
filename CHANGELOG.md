@@ -4,7 +4,7 @@ Yii Framework 2 Symfony mailer extension Change Log
 2.0.3 under development
 -----------------------
 
-- no changes in this release.
+- remove final from Mailer and Message class.
 
 
 2.0.2 February 03, 2022
