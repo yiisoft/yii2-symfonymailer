@@ -1,7 +1,7 @@
 Yii Framework 2 Symfony mailer extension Change Log
 ================================================
 
-2.0.3 under development
+2.0.3 February 10, 2022
 -----------------------
 
 - Fix #20: Remove final from Mailer and Message class (Krakozaber)
