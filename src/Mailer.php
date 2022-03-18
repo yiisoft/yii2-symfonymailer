@@ -123,7 +123,8 @@ class Mailer extends BaseMailer
             );
             $transport = $transportObj->fromDsnObject($dsn);
         } else {
-            $transport = $transportObj->fromString('null://null');
+            throw new InvalidConfigException('"' . get_class($this) . '::transport" should be either object or array.');
+            //$transport = $transportObj->fromString('null://null');
         }
         return $transport;
     }
