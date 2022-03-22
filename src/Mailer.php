@@ -123,7 +123,7 @@ class Mailer extends BaseMailer
             );
             $transport = $transportObj->fromDsnObject($dsn);
         } else {
-            $transport = $transportObj->fromString('null://null');
+            throw new InvalidConfigException('Transport configuration array must contain either "dsn", or "scheme" and "host" keys.');
         }
         return $transport;
     }
