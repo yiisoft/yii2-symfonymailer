@@ -112,7 +112,7 @@ class Mailer extends BaseMailer
 
     private function createTransportFactory(bool $enableLogging): Transport
     {
-        $logger = $enableLogging ? new Logger() : null;
+        $logger = $enableLogging ? new Logger(\Yii::getLogger()) : null;
         $defaultFactories = Transport::getDefaultFactories(null, null, $logger);
         return new Transport($defaultFactories);
     }

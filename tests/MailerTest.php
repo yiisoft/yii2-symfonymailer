@@ -4,16 +4,11 @@ declare(strict_types=1);
 namespace yiiunit\extensions\symfonymailer;
 
 use Symfony\Component\Mailer\Transport;
-use Symfony\Component\Mailer\Transport\NullTransportFactory;
-use Symfony\Component\Mailer\Transport\Smtp\SmtpTransport;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Yii;
 use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
-use yii\mail\MessageInterface;
 use yii\symfonymailer\Mailer;
-use Symfony\Component\Mailer\Transport\Dsn;
-use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransportFactory;
 use yii\symfonymailer\Message;
 
 Yii::setAlias('@yii/symfonymailer', __DIR__ . '/../../../../extensions/symfonymailer');

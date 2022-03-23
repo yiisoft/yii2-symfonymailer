@@ -10,11 +10,34 @@ namespace yii\symfonymailer;
 use Psr\Log\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LoggerTrait;
+use Psr\Log\LogLevel;
 use Yii;
+use yii\log\Logger as YiiLogger;
 
 final class Logger implements LoggerInterface
 {
     use LoggerTrait;
+
+    private YiiLogger $logger;
+    private array $map;
+    private string $category;
+
+    public function __construct(YiiLogger $logger, array $map = [
+        LogLevel::ERROR => YiiLogger::LEVEL_ERROR,
+        LogLevel::CRITICAL => YiiLogger::LEVEL_ERROR,
+        LogLevel::ALERT => YiiLogger::LEVEL_ERROR,
+        LogLevel::EMERGENCY => YiiLogger::LEVEL_ERROR,
+        LogLevel::NOTICE => YiiLogger::LEVEL_WARNING,
+        LogLevel::WARNING => YiiLogger::LEVEL_WARNING,
+        LogLevel::DEBUG => YiiLogger::LEVEL_INFO,
+        LogLevel::INFO => YiiLogger::LEVEL_INFO,
+    ], string $category = 'PSR Logging Adapter')
+    {
+        $this->logger = $logger;
+        $this->map = $map;
+        $this->category = $category;
+    }
+
 
     /**
      * Logs with an arbitrary level.
@@ -29,24 +52,10 @@ final class Logger implements LoggerInterface
      */
     public function log($level, $message, array $context = []): void
     {
-        switch ($level) {
-            case 'error':
-            case 'critical':
-            case 'alert':
-            case 'emergency':
-                $yiiLevel = \yii\log\Logger::LEVEL_ERROR;
-                break;
-            case 'notice':
-            case 'warning':
-                $yiiLevel = \yii\log\Logger::LEVEL_WARNING;
-                break;
-            case 'debug':
-            case 'info':
-                $yiiLevel = \yii\log\Logger::LEVEL_INFO;
-                break;
-            default:
-                throw new InvalidArgumentException("Unknown logging level $level");
+        if (!isset($this->map[$level])) {
+            throw new InvalidArgumentException("Unknown logging level $level");
         }
-        Yii::getLogger()->log($message, $yiiLevel, "PSR Logging Adapter");
+
+        $this->logger->log($message, $this->map[$level], $this->category);
     }
 }
