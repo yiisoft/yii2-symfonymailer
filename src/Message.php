@@ -22,13 +22,19 @@ class Message extends BaseMessage
     public function __construct($config = [])
     {
         $this->email = new Email();
-        parent::__construct($config);        
+        parent::__construct($config);
     }
 
     public function __clone()
     {
         $this->email = clone $this->email;
     }
+
+    public function __sleep()
+    {
+        return ['email', 'charset'];
+    }
+
 
     public function getCharset(): string
     {

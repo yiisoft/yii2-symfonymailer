@@ -17,6 +17,7 @@ use Symfony\Component\Mime\Crypto\DkimSigner;
 use Symfony\Component\Mime\Crypto\SMimeEncrypter;
 use Symfony\Component\Mime\Crypto\SMimeSigner;
 use Yii;
+use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
 use yii\mail\BaseMailer;
 
@@ -35,17 +36,17 @@ class Mailer extends BaseMailer
     private $signer = null;
     private array $dkimSignerOptions = [];
     /**
-     * @var TransportInterface|array Symfony transport instance or its array configuration.
+     * @var TransportInterface Symfony transport instance or its array configuration.
      */
-    private $_transport = [];
+    private TransportInterface $_transport;
 
-
+    public Transport $transportFactory;
     /**
      * @var bool whether to enable writing of the Mailer internal logs using Yii log mechanism.
      * If enabled [[Logger]] plugin will be attached to the [[transport]] for this purpose.
      * @see Logger
      */
-    public bool $enableMailerLogging = false;
+    public bool $_enableMailerLogging;
     /**
      * Creates Symfony mailer instance.
      * @return SymfonyMailer mailer instance.
@@ -57,6 +58,7 @@ class Mailer extends BaseMailer
 
     /**
      * @return SymfonyMailer Swift mailer instance
+     * @deprecated This will become private
      */
     public function getSymfonyMailer(): SymfonyMailer
     {
@@ -73,45 +75,53 @@ class Mailer extends BaseMailer
     public function setTransport($transport): void
     {
         if (!is_array($transport) && !$transport instanceof TransportInterface) {
-            throw new InvalidConfigException('"' . get_class($this) . '::transport" should be either object or array, "' . gettype($transport) . '" given.');
+            throw new InvalidArgumentException('"' . get_class($this) . '::transport" should be either object or array, "' . gettype($transport) . '" given.');
         }
-        if ($transport instanceof TransportInterface) {
-            $this->_transport = $transport;
-        } elseif (is_array($transport)) {
-            $this->_transport = $this->createTransport($transport);
-        }
+
+        $this->_transport = $transport instanceof TransportInterface ? $transport : $this->createTransport($transport);
 
         $this->symfonyMailer = null;
     }
 
     /**
      * @return TransportInterface
+     * @deprecated This will become private
      */
     public function getTransport(): TransportInterface
     {
-        if (!is_object($this->_transport)) {
-            $this->_transport = $this->createTransport($this->_transport);
+        if (!isset($this->_transport)) {
+            throw new InvalidConfigException('No transport was configured.');
         }
         return $this->_transport;
     }
 
+    public function init()
+    {
+        if (!isset($this->_enableMailerLogging)) {
+            $this->setEnableMailerLogging(false);
+        }
+    }
+
+    public function setEnableMailerLogging(bool $value): void
+    {
+        if (!isset($this->_enableMailerLogging) || $this->_enableMailerLogging !== $value) {
+            $this->transportFactory = $this->createTransportFactory($value);
+            $this->_enableMailerLogging = $value;
+        }
+    }
+
+    private function createTransportFactory(bool $enableLogging): Transport
+    {
+        $logger = $enableLogging ? new Logger() : null;
+        $defaultFactories = Transport::getDefaultFactories(null, null, $logger);
+        return new Transport($defaultFactories);
+    }
+
+
     private function createTransport(array $config = []): TransportInterface
     {
-        if (array_key_exists('enableMailerLogging', $config)) {
-            $this->enableMailerLogging = $config['enableMailerLogging'];
-            unset($config['enableMailerLogging']);
-        }
-
-        $logger = null;
-        if ($this->enableMailerLogging) {
-            $logger = new Logger();
-        }
-
-        $defaultFactories = Transport::getDefaultFactories(null, null, $logger);
-        $transportObj = new Transport($defaultFactories);
-
         if (array_key_exists('dsn', $config)) {
-            $transport = $transportObj->fromString($config['dsn']);
+            $transport = $this->transportFactory->fromString($config['dsn']);
         } elseif(array_key_exists('scheme', $config) && array_key_exists('host', $config)) {
             $dsn = new Dsn(
                 $config['scheme'],
@@ -121,13 +131,12 @@ class Mailer extends BaseMailer
                 $config['port'] ?? '',
                 $config['options'] ?? [],
             );
-            $transport = $transportObj->fromDsnObject($dsn);
+            $transport = $this->transportFactory->fromDsnObject($dsn);
         } else {
             throw new InvalidConfigException('Transport configuration array must contain either "dsn", or "scheme" and "host" keys.');
         }
         return $transport;
     }
-
 
     /**
      * Returns a new instance with the specified encryptor.

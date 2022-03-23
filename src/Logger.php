@@ -145,19 +145,19 @@ final class Logger implements LoggerInterface
             case 'critical':
             case 'alert':
             case 'emergency':
-                $level = \yii\log\Logger::LEVEL_ERROR;
+                $yiiLevel = \yii\log\Logger::LEVEL_ERROR;
                 break;
             case 'notice':
             case 'warning':
-                $level = \yii\log\Logger::LEVEL_WARNING;
+                $yiiLevel = \yii\log\Logger::LEVEL_WARNING;
                 break;
             case 'debug':
             case 'info':
-                $level = \yii\log\Logger::LEVEL_INFO;
+                $yiiLevel = \yii\log\Logger::LEVEL_INFO;
                 break;
             default:
-                $level = \yii\log\Logger::LEVEL_INFO;
+                $yiiLevel = \yii\log\Logger::LEVEL_INFO;
         }
-        Yii::getLogger()->log($message, $level, __METHOD__);
+        Yii::getLogger()->log($message, $yiiLevel, "PSR Logging Adapter");
     }
 }
