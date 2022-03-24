@@ -13,8 +13,8 @@ use yii\base\InvalidConfigException;
 use yii\mail\MessageInterface;
 use yii\symfonymailer\Mailer;
 use yii\symfonymailer\Message;
-use yii\symfonymailer\SymfonyMessageEncrypterInterface;
-use yii\symfonymailer\SymfonyMessageSignerInterface;
+use yii\symfonymailer\MessageEncrypterInterface;
+use yii\symfonymailer\MessageSignerInterface;
 
 Yii::setAlias('@yii/symfonymailer', __DIR__ . '/../../../../extensions/symfonymailer');
 
@@ -43,7 +43,7 @@ final class MailerTest extends TestCase
         $mailer->transport = new Transport\NullTransport();
 
         $message = new Message();
-        $encrypter = $this->getMockBuilder(SymfonyMessageEncrypterInterface::class)->getMock();
+        $encrypter = $this->getMockBuilder(MessageEncrypterInterface::class)->getMock();
         $encrypter->expects($this->once())->method('encrypt')->willReturnCallback(function ($message) {
             return $message;
         });
@@ -57,7 +57,7 @@ final class MailerTest extends TestCase
         $mailer->transport = new Transport\NullTransport();
 
         $message = new Message();
-        $signer = $this->getMockBuilder(SymfonyMessageSignerInterface::class)->getMock();
+        $signer = $this->getMockBuilder(MessageSignerInterface::class)->getMock();
         $signer->expects($this->once())->method('sign')->willReturnCallback(function ($message) {
             return $message;
         });

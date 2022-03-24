@@ -33,7 +33,7 @@ final class Logger implements LoggerInterface
         LogLevel::WARNING => YiiLogger::LEVEL_WARNING,
         LogLevel::DEBUG => YiiLogger::LEVEL_INFO,
         LogLevel::INFO => YiiLogger::LEVEL_INFO,
-    ], string $category = 'PSR Logging Adapter')
+    ], string $category = 'app')
     {
         $this->logger = $logger;
         $this->map = $map;

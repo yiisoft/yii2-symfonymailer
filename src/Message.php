@@ -15,7 +15,7 @@ use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Header\HeaderInterface;
 use yii\mail\BaseMessage;
 
-class Message extends BaseMessage implements SymfonyMessageWrapperInterface
+class Message extends BaseMessage implements MessageWrapperInterface
 {
     private Email $email;
 
@@ -160,20 +160,10 @@ class Message extends BaseMessage implements SymfonyMessageWrapperInterface
         return $this;
     }
 
-    public function getTextBody(): string
-    {
-        return (string) $this->email->getTextBody();
-    }
-
     public function setTextBody($text): self
     {
         $this->email->text($text, $this->charset);
         return $this;
-    }
-
-    public function getHtmlBody(): string
-    {
-        return (string) $this->email->getHtmlBody();
     }
 
     public function setHtmlBody($html): self

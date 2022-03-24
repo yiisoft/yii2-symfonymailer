@@ -30,12 +30,12 @@ class Mailer extends BaseMailer
     /**
      * @see https://symfony.com/doc/current/mailer.html#encrypting-messages
      */
-    public ?SymfonyMessageEncrypterInterface $encrypter = null;
+    public ?MessageEncrypterInterface $encrypter = null;
 
     /**
      * @see https://symfony.com/doc/current/mailer.html#signing-messages
      */
-    public ?SymfonyMessageSignerInterface $signer = null;
+    public ?MessageSignerInterface $signer = null;
 
     public array $signerOptions = [];
 
@@ -57,9 +57,8 @@ class Mailer extends BaseMailer
 
     /**
      * @return SymfonyMailer Swift mailer instance
-     * @deprecated This will become private
      */
-    public function getSymfonyMailer(): SymfonyMailer
+    private function getSymfonyMailer(): SymfonyMailer
     {
         if (! isset($this->symfonyMailer)) {
             $this->symfonyMailer = $this->createSymfonyMailer();
@@ -126,10 +125,10 @@ class Mailer extends BaseMailer
 
     protected function sendMessage($message): bool
     {
-        if (! ($message instanceof SymfonyMessageWrapperInterface)) {
+        if (! ($message instanceof MessageWrapperInterface)) {
             throw new InvalidArgumentException(sprintf(
                 'The message must be an instance of "%s". The "%s" instance is received.',
-                SymfonyMessageWrapperInterface::class,
+                MessageWrapperInterface::class,
                 get_class($message),
             ));
         }
