@@ -16,6 +16,7 @@ use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Crypto\DkimSigner;
 use Symfony\Component\Mime\Crypto\SMimeEncrypter;
 use Symfony\Component\Mime\Crypto\SMimeSigner;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\mail\BaseMailer;
@@ -26,6 +27,11 @@ class Mailer extends BaseMailer
      * @var string message default class name.
      */
     public $messageClass = Message::class;
+
+    /**
+     * @var HttpClientInterface|null
+     */
+    public ?HttpClientInterface $httpClient = null;
 
     private ?SymfonyMailer $symfonyMailer = null;
     private ?SMimeEncrypter $encryptor = null;
@@ -107,7 +113,7 @@ class Mailer extends BaseMailer
             $logger = new Logger();
         }
 
-        $defaultFactories = Transport::getDefaultFactories(null, null, $logger);
+        $defaultFactories = Transport::getDefaultFactories(null, $this->httpClient, $logger);
         $transportObj = new Transport($defaultFactories);
 
         if (array_key_exists('dsn', $config)) {
