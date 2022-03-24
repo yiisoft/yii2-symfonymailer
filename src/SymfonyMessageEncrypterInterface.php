@@ -6,7 +6,7 @@ namespace yii\symfonymailer;
 
 use Symfony\Component\Mime\Message as Message;
 
-interface SymfonyMessageEncrypterInterface
+interface MessageEncrypterInterface
 {
     public function encrypt(Message $message): Message;
 }
