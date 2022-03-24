@@ -6,7 +6,7 @@ namespace yii\symfonymailer;
 
 use Symfony\Component\Mime\Message;
 
-interface SymfonyMessageSignerInterface
+interface MessageSignerInterface
 {
     public function sign(Message $message, array $options = []): Message;
 }
