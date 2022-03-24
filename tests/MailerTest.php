@@ -5,11 +5,15 @@ namespace yiiunit\extensions\symfonymailer;
 
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Transport\TransportInterface;
+use Symfony\Component\Mime\Crypto\SMimeEncrypter;
 use Yii;
 use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
+use yii\mail\MessageInterface;
 use yii\symfonymailer\Mailer;
 use yii\symfonymailer\Message;
+use yii\symfonymailer\SymfonyMessageEncrypterInterface;
+use yii\symfonymailer\SymfonyMessageSignerInterface;
 
 Yii::setAlias('@yii/symfonymailer', __DIR__ . '/../../../../extensions/symfonymailer');
 
@@ -24,11 +28,40 @@ final class MailerTest extends TestCase
         $transport = $this->getMockBuilder(TransportInterface::class)->getMock();
         $transport->expects($this->once())->method('send');
 
-        $mailer = new Mailer(['transport' => $transport]);
+        $mailer = new Mailer();
+        $mailer->transport = $transport;
 
         $message = $this->getMockBuilder(Message::class)->getMock();
         // We test if the correct transport is used
         $mailer->send($message);
+    }
+
+    public function testSendWithEncryptor(): void
+    {
+        $mailer = new Mailer();
+        $mailer->transport = new Transport\NullTransport();
+
+
+        $message = new Message();
+        $encrypter = $this->getMockBuilder(SymfonyMessageEncrypterInterface::class)->getMock();
+        $encrypter->expects($this->once())->method('encrypt')->willReturnCallback(function($message) { return $message; });
+        $mailer = $mailer->withEncrypter($encrypter);
+        $mailer->send($message);
+
+    }
+
+    public function testSendWithSigner(): void
+    {
+        $mailer = new Mailer();
+        $mailer->transport = new Transport\NullTransport();
+
+
+        $message = new Message();
+        $signer = $this->getMockBuilder(SymfonyMessageSignerInterface::class)->getMock();
+        $signer->expects($this->once())->method('sign')->willReturnCallback(function($message) { return $message; });
+        $mailer = $mailer->withSigner($signer);
+        $mailer->send($message);
+
     }
 
     /**
@@ -92,5 +125,14 @@ final class MailerTest extends TestCase
         $mailer = new Mailer();
         $this->expectException(InvalidConfigException::class);
         $mailer->getTransport();
+    }
+
+    public function testSendMessageThrowsOnBadMessageType(): void
+    {
+        $mailer = new Mailer();
+        $this->expectException(InvalidArgumentException::class);
+        $message = $this->getMockBuilder(MessageInterface::class)->getMock();
+
+        $mailer->send($message);
     }
 }

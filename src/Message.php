@@ -4,6 +4,7 @@
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
+declare(strict_types=1);
 
 namespace yii\symfonymailer;
 
@@ -15,7 +16,7 @@ use Symfony\Component\Mime\Header\HeaderInterface;
 use yii\mail\BaseMessage;
 
 
-class Message extends BaseMessage
+class Message extends BaseMessage implements SymfonyMessageWrapperInterface
 {
     private Email $email;
     private string $charset = 'utf-8';

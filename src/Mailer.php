@@ -4,17 +4,16 @@
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license http://www.yiiframework.com/license/
  */
+declare(strict_types=1);
 
 namespace yii\symfonymailer;
 
 use RuntimeException;
 use Symfony\Component\Mailer\Mailer as SymfonyMailer;
-use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Crypto\DkimSigner;
-use Symfony\Component\Mime\Crypto\SMimeEncrypter;
 use Symfony\Component\Mime\Crypto\SMimeSigner;
 use Yii;
 use yii\base\InvalidArgumentException;
@@ -29,12 +28,10 @@ class Mailer extends BaseMailer
     public $messageClass = Message::class;
 
     private ?SymfonyMailer $symfonyMailer = null;
-    private ?SMimeEncrypter $encryptor = null;
-    /**
-     * @var DkimSigner|SMimeSigner|null
-     */
-    private $signer = null;
-    private array $dkimSignerOptions = [];
+    private ?SymfonyMessageEncrypterInterface $encrypter = null;
+
+    private ?SymfonyMessageSignerInterface $signer = null;
+    private array $signerOptions = [];
     /**
      * @var TransportInterface Symfony transport instance or its array configuration.
      */
@@ -62,7 +59,7 @@ class Mailer extends BaseMailer
      */
     public function getSymfonyMailer(): SymfonyMailer
     {
-        if (!is_object($this->symfonyMailer)) {
+        if (!isset($this->symfonyMailer)) {
             $this->symfonyMailer = $this->createSymfonyMailer();
         }
         return $this->symfonyMailer;
@@ -139,83 +136,58 @@ class Mailer extends BaseMailer
     }
 
     /**
-     * Returns a new instance with the specified encryptor.
+     * Returns a new instance with the specified encrypter.
      *
-     * @param SMimeEncrypter $encryptor The encryptor instance.
-     *
-     * @see https://symfony.com/doc/current/mailer.html#encrypting-messages
-     *
+     * @param SymfonyMessageEncrypterInterface $encrypter The encrypter instance.
      * @return self
+     *@see https://symfony.com/doc/current/mailer.html#encrypting-messages
+     *
      */
-    public function withEncryptor(SMimeEncrypter $encryptor): self
+    public function withEncrypter(SymfonyMessageEncrypterInterface $encrypter): self
     {
         $new = clone $this;
-        $new->encryptor = $encryptor;
+        $new->encrypter = $encrypter;
         return $new;
     }
 
     /**
      * Returns a new instance with the specified signer.
      *
-     * @param DkimSigner|object|SMimeSigner $signer The signer instance.
-     * @param array $options The options for DKIM signer {@see DkimSigner}.
-     *
-     * @throws RuntimeException If the signer is not an instance of {@see DkimSigner} or {@see SMimeSigner}.
-     *
+     * @param SymfonyMessageSignerInterface $signer The signer instance.
+     * @param array $options The dynamic options for the signer, for example see DKIM signer {@see DkimSigner}.
      * @see https://symfony.com/doc/current/mailer.html#signing-messages
-     *
      * @return self
      */
-    public function withSigner(object $signer, array $options = []): self
+    public function withSigner(SymfonyMessageSignerInterface $signer, array $options = []): self
     {
         $new = clone $this;
-
-        if ($signer instanceof DkimSigner) {
-            $new->signer = $signer;
-            $new->dkimSignerOptions = $options;
-            return $new;
-        }
-
-        if ($signer instanceof SMimeSigner) {
-            $new->signer = $signer;
-            return $new;
-        }
-
-        throw new RuntimeException(sprintf(
-            'The signer must be an instance of "%s" or "%s". The "%s" instance is received.',
-            DkimSigner::class,
-            SMimeSigner::class,
-            get_class($signer),
-        ));
+        $new->signer = $signer;
+        $new->signerOptions = $options;
+        return $new;
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @throws TransportExceptionInterface If sending failed.
      */
     protected function sendMessage($message): bool
     {
-        if (!($message instanceof Message)) {
-            throw new RuntimeException(sprintf(
+        if (!($message instanceof SymfonyMessageWrapperInterface)) {
+            throw new InvalidArgumentException(sprintf(
                 'The message must be an instance of "%s". The "%s" instance is received.',
-                Message::class,
+                SymfonyMessageWrapperInterface::class,
                 get_class($message),
             ));
         }
 
-        $message = $message->getSymfonyEmail();
-        if ($this->encryptor !== null) {
-            $message = $this->encryptor->encrypt($message);
-        }
-
-        if ($this->signer !== null) {
-            $message = $this->signer instanceof DkimSigner
-                ? $this->signer->sign($message, $this->dkimSignerOptions)
-                : $this->signer->sign($message)
-            ;
-        }
         try {
+            $message = $message->getSymfonyEmail();
+            if ($this->encrypter !== null) {
+                $message = $this->encrypter->encrypt($message);
+            }
+
+            if ($this->signer !== null) {
+                $message = $this->signer->sign($message, $this->signerOptions);
+            }
             $this->getSymfonyMailer()->send($message);
         } catch (\Exception $exception) {
             Yii::getLogger()->log($exception->getMessage(), \yii\log\Logger::LEVEL_ERROR, __METHOD__);
