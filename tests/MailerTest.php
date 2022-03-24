@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace yiiunit\extensions\symfonymailer;
@@ -41,13 +42,13 @@ final class MailerTest extends TestCase
         $mailer = new Mailer();
         $mailer->transport = new Transport\NullTransport();
 
-
         $message = new Message();
         $encrypter = $this->getMockBuilder(SymfonyMessageEncrypterInterface::class)->getMock();
-        $encrypter->expects($this->once())->method('encrypt')->willReturnCallback(function($message) { return $message; });
+        $encrypter->expects($this->once())->method('encrypt')->willReturnCallback(function ($message) {
+            return $message;
+        });
         $mailer->encrypter = $encrypter;
         $mailer->send($message);
-
     }
 
     public function testSendWithSigner(): void
@@ -55,13 +56,13 @@ final class MailerTest extends TestCase
         $mailer = new Mailer();
         $mailer->transport = new Transport\NullTransport();
 
-
         $message = new Message();
         $signer = $this->getMockBuilder(SymfonyMessageSignerInterface::class)->getMock();
-        $signer->expects($this->once())->method('sign')->willReturnCallback(function($message) { return $message; });
+        $signer->expects($this->once())->method('sign')->willReturnCallback(function ($message) {
+            return $message;
+        });
         $mailer->signer = $signer;
         $mailer->send($message);
-
     }
 
     /**
@@ -75,7 +76,9 @@ final class MailerTest extends TestCase
             'username' => 'username',
             'password' => 'password',
             'port' => 465,
-            'options' => ['ssl' => true],
+            'options' => [
+                'ssl' => true,
+            ],
         ];
         $mailer = new Mailer();
 
@@ -95,7 +98,6 @@ final class MailerTest extends TestCase
         $mailer = new Mailer();
         $this->expectException(InvalidConfigException::class);
         $mailer->setTransport($transportConfig);
-
     }
 
     public function testConfigureTransportFromString(): void
@@ -107,7 +109,9 @@ final class MailerTest extends TestCase
         $factory->expects($this->once())->method('create');
 
         $mailer->transportFactory = new Transport([$factory]);
-        $mailer->setTransport(['dsn' => 'null://null']);
+        $mailer->setTransport([
+            'dsn' => 'null://null',
+        ]);
     }
 
     public function testSetTransportWithInvalidArgumentThrowsException(): void

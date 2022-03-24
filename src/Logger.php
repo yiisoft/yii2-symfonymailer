@@ -19,7 +19,9 @@ final class Logger implements LoggerInterface
     use LoggerTrait;
 
     private YiiLogger $logger;
+
     private array $map;
+
     private string $category;
 
     public function __construct(YiiLogger $logger, array $map = [
@@ -38,7 +40,6 @@ final class Logger implements LoggerInterface
         $this->category = $category;
     }
 
-
     /**
      * Logs with an arbitrary level.
      *
@@ -46,13 +47,11 @@ final class Logger implements LoggerInterface
      * @param string|\Stringable $message
      * @param mixed[] $context
      *
-     * @return void
-     *
      * @throws \Psr\Log\InvalidArgumentException
      */
     public function log($level, $message, array $context = []): void
     {
-        if (!isset($this->map[$level])) {
+        if (! isset($this->map[$level])) {
             throw new InvalidArgumentException("Unknown logging level $level");
         }
 

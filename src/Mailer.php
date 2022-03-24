@@ -26,6 +26,7 @@ class Mailer extends BaseMailer
     public $messageClass = Message::class;
 
     private ?SymfonyMailer $symfonyMailer = null;
+
     /**
      * @see https://symfony.com/doc/current/mailer.html#encrypting-messages
      */
@@ -35,19 +36,16 @@ class Mailer extends BaseMailer
      * @see https://symfony.com/doc/current/mailer.html#signing-messages
      */
     public ?SymfonyMessageSignerInterface $signer = null;
+
     public array $signerOptions = [];
+
     /**
      * @var TransportInterface Symfony transport instance or its array configuration.
      */
     private TransportInterface $_transport;
 
     public Transport $transportFactory;
-    /**
-     * @var bool whether to enable writing of the Mailer internal logs using Yii log mechanism.
-     * If enabled [[Logger]] plugin will be attached to the [[transport]] for this purpose.
-     * @see Logger
-     */
-    public bool $_enableMailerLogging;
+
     /**
      * Creates Symfony mailer instance.
      * @return SymfonyMailer mailer instance.
@@ -63,7 +61,7 @@ class Mailer extends BaseMailer
      */
     public function getSymfonyMailer(): SymfonyMailer
     {
-        if (!isset($this->symfonyMailer)) {
+        if (! isset($this->symfonyMailer)) {
             $this->symfonyMailer = $this->createSymfonyMailer();
         }
         return $this->symfonyMailer;
@@ -75,7 +73,7 @@ class Mailer extends BaseMailer
      */
     public function setTransport($transport): void
     {
-        if (!is_array($transport) && !$transport instanceof TransportInterface) {
+        if (! is_array($transport) && ! $transport instanceof TransportInterface) {
             throw new InvalidArgumentException('"' . get_class($this) . '::transport" should be either object or array, "' . gettype($transport) . '" given.');
         }
 
@@ -85,12 +83,11 @@ class Mailer extends BaseMailer
     }
 
     /**
-     * @return TransportInterface
      * @deprecated This will become private
      */
     public function getTransport(): TransportInterface
     {
-        if (!isset($this->_transport)) {
+        if (! isset($this->_transport)) {
             throw new InvalidConfigException('No transport was configured.');
         }
         return $this->_transport;
@@ -98,32 +95,20 @@ class Mailer extends BaseMailer
 
     public function init()
     {
-        if (!isset($this->_enableMailerLogging)) {
-            $this->setEnableMailerLogging(false);
-        }
+        $this->transportFactory = $this->transportFactory ?? $this->createTransportFactory();
     }
 
-    public function setEnableMailerLogging(bool $value): void
+    private function createTransportFactory(): Transport
     {
-        if (!isset($this->_enableMailerLogging) || $this->_enableMailerLogging !== $value) {
-            $this->transportFactory = $this->createTransportFactory($value);
-            $this->_enableMailerLogging = $value;
-        }
-    }
-
-    private function createTransportFactory(bool $enableLogging): Transport
-    {
-        $logger = $enableLogging ? new Logger(\Yii::getLogger()) : null;
-        $defaultFactories = Transport::getDefaultFactories(null, null, $logger);
+        $defaultFactories = Transport::getDefaultFactories();
         return new Transport($defaultFactories);
     }
-
 
     private function createTransport(array $config = []): TransportInterface
     {
         if (array_key_exists('dsn', $config)) {
             $transport = $this->transportFactory->fromString($config['dsn']);
-        } elseif(array_key_exists('scheme', $config) && array_key_exists('host', $config)) {
+        } elseif (array_key_exists('scheme', $config) && array_key_exists('host', $config)) {
             $dsn = new Dsn(
                 $config['scheme'],
                 $config['host'],
@@ -139,12 +124,9 @@ class Mailer extends BaseMailer
         return $transport;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     protected function sendMessage($message): bool
     {
-        if (!($message instanceof SymfonyMessageWrapperInterface)) {
+        if (! ($message instanceof SymfonyMessageWrapperInterface)) {
             throw new InvalidArgumentException(sprintf(
                 'The message must be an instance of "%s". The "%s" instance is received.',
                 SymfonyMessageWrapperInterface::class,

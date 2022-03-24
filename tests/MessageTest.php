@@ -25,16 +25,15 @@ final class MessageTest extends TestCase
      */
     private $testEmailReceiver = 'someuser@somedomain.com';
 
-
     public function setUp(): void
     {
         $this->mockApplication([
             'components' => [
-                'mailer' => $this->createTestEmailComponent()
-            ]
+                'mailer' => $this->createTestEmailComponent(),
+            ],
         ]);
         $filePath = $this->getTestFilePath();
-        if (!file_exists($filePath)) {
+        if (! file_exists($filePath)) {
             FileHelper::createDirectory($filePath);
         }
     }
@@ -83,7 +82,7 @@ final class MessageTest extends TestCase
      */
     private function createImageFile($fileName = 'test.jpg', $text = 'Test Image'): string
     {
-        if (!function_exists('imagecreatetruecolor')) {
+        if (! function_exists('imagecreatetruecolor')) {
             $this->markTestSkipped('GD lib required.');
         }
         $fileFullName = $this->getTestFilePath() . DIRECTORY_SEPARATOR . $fileName;
@@ -140,11 +139,19 @@ final class MessageTest extends TestCase
         $m1 = new Message();
         $m1->setFrom('user@example.com');
         $m2 = clone $m1;
-        $m1->setTo(['user1@example.com' => 'user1']);
-        $m2->setTo(['user2@example.com' => 'user2']);
+        $m1->setTo([
+            'user1@example.com' => 'user1',
+        ]);
+        $m2->setTo([
+            'user2@example.com' => 'user2',
+        ]);
 
-        $this->assertEquals(['user1@example.com' => 'user1'], $m1->getTo());
-        $this->assertEquals(['user2@example.com' => 'user2'], $m2->getTo());
+        $this->assertEquals([
+            'user1@example.com' => 'user1',
+        ], $m1->getTo());
+        $this->assertEquals([
+            'user2@example.com' => 'user2',
+        ], $m2->getTo());
 
         $messageWithoutSymfonyInitialized = new Message();
         $m2 = clone $messageWithoutSymfonyInitialized; // should be no error during cloning
@@ -229,7 +236,10 @@ final class MessageTest extends TestCase
         $message->setTextBody('Yii Symfony Create Attachment Test body');
         $fileName = 'test.txt';
         $fileContent = 'Test attachment content';
-        $message->attachContent($fileContent, ['fileName' => $fileName, 'contentType' => 'image/png']);
+        $message->attachContent($fileContent, [
+            'fileName' => $fileName,
+            'contentType' => 'image/png',
+        ]);
 
         $this->assertTrue($message->send());
         $attachment = $this->getAttachment($message);
@@ -253,7 +263,7 @@ final class MessageTest extends TestCase
         $message->setTo($this->testEmailReceiver);
         $message->setFrom('someuser@somedomain.com');
         $message->setSubject('Yii Symfony Embed File Test');
-        $message->setHtmlBody('Embed image: <img src="' . $cid. '" alt="pic">');
+        $message->setHtmlBody('Embed image: <img src="' . $cid . '" alt="pic">');
 
         $this->assertTrue($message->send());
 
@@ -275,14 +285,17 @@ final class MessageTest extends TestCase
         $contentType = 'image/jpeg';
         $fileContent = file_get_contents($fileFullName);
 
-        $cid = $message->embedContent($fileContent, ['fileName' => $fileName, 'contentType' => $contentType]);
+        $cid = $message->embedContent($fileContent, [
+            'fileName' => $fileName,
+            'contentType' => $contentType,
+        ]);
         $this->assertIsString($cid);
         $this->assertStringStartsWith('cid:', $cid);
 
         $message->setTo($this->testEmailReceiver);
         $message->setFrom('someuser@somedomain.com');
         $message->setSubject('Yii Symfony Embed File Test');
-        $message->setHtmlBody('Embed image: <img src="' . $cid. '" alt="pic">');
+        $message->setHtmlBody('Embed image: <img src="' . $cid . '" alt="pic">');
 
         $this->assertTrue($message->send());
 

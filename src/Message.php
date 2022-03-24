@@ -15,11 +15,12 @@ use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Header\HeaderInterface;
 use yii\mail\BaseMessage;
 
-
 class Message extends BaseMessage implements SymfonyMessageWrapperInterface
 {
     private Email $email;
+
     private string $charset = 'utf-8';
+
     public function __construct($config = [])
     {
         $this->email = new Email();
@@ -35,7 +36,6 @@ class Message extends BaseMessage implements SymfonyMessageWrapperInterface
     {
         return ['email', 'charset'];
     }
-
 
     public function getCharset(): string
     {
@@ -182,19 +182,16 @@ class Message extends BaseMessage implements SymfonyMessageWrapperInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
     public function attach($fileName, array $options = [])
     {
         $file = [];
-        if (!empty($options['fileName'])) {
+        if (! empty($options['fileName'])) {
             $file['name'] = $options['fileName'];
         } else {
             $file['name'] = $fileName;
         }
 
-        if (!empty($options['contentType'])) {
+        if (! empty($options['contentType'])) {
             $file['contentType'] = $options['contentType'];
         } else {
             $file['contentType'] = mime_content_type($fileName);
@@ -204,19 +201,16 @@ class Message extends BaseMessage implements SymfonyMessageWrapperInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
     public function attachContent($content, array $options = [])
     {
         $file = [];
-        if (!empty($options['fileName'])) {
+        if (! empty($options['fileName'])) {
             $file['name'] = $options['fileName'];
         } else {
             $file['name'] = null;
         }
 
-        if (!empty($options['contentType'])) {
+        if (! empty($options['contentType'])) {
             $file['contentType'] = $options['contentType'];
         } else {
             $file['contentType'] = null;
@@ -226,19 +220,16 @@ class Message extends BaseMessage implements SymfonyMessageWrapperInterface
         return $this;
     }
 
-    /**
-     * @inheritdoc
-     */
     public function embed($fileName, array $options = [])
     {
         $file = [];
-        if (!empty($options['fileName'])) {
+        if (! empty($options['fileName'])) {
             $file['name'] = $options['fileName'];
         } else {
             $file['name'] = $fileName;
         }
 
-        if (!empty($options['contentType'])) {
+        if (! empty($options['contentType'])) {
             $file['contentType'] = $options['contentType'];
         } else {
             $file['contentType'] = mime_content_type($fileName);
@@ -248,19 +239,16 @@ class Message extends BaseMessage implements SymfonyMessageWrapperInterface
         return 'cid:' . $file['name'];
     }
 
-    /**
-     * @inheritdoc
-     */
     public function embedContent($content, array $options = [])
     {
         $file = [];
-        if (!empty($options['fileName'])) {
+        if (! empty($options['fileName'])) {
             $file['name'] = $options['fileName'];
         } else {
             $file['name'] = null;
         }
 
-        if (!empty($options['contentType'])) {
+        if (! empty($options['contentType'])) {
             $file['contentType'] = $options['contentType'];
         } else {
             $file['contentType'] = null;
@@ -273,7 +261,7 @@ class Message extends BaseMessage implements SymfonyMessageWrapperInterface
     public function getHeader($name): array
     {
         $headers = $this->email->getHeaders();
-        if (!$headers->has($name)) {
+        if (! $headers->has($name)) {
             return [];
         }
 
@@ -366,7 +354,7 @@ class Message extends BaseMessage implements SymfonyMessageWrapperInterface
         $addresses = [];
 
         foreach ($strings as $address => $name) {
-            if (!is_string($address)) {
+            if (! is_string($address)) {
                 // email address without name
                 $addresses[] = new Address($name);
                 continue;
