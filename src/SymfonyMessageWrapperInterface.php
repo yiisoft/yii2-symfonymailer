@@ -6,7 +6,7 @@ namespace yii\symfonymailer;
 
 use Symfony\Component\Mime\Email;
 
-interface SymfonyMessageWrapperInterface
+interface MessageWrapperInterface
 {
     public function getSymfonyEmail(): Email;
 }
