@@ -66,7 +66,7 @@ class MailerTest extends TestCase
 
     public function testGetSymfonyMailer()
     {
-        $mailer = new Mailer();
+        $mailer = new Mailer(['transport' => ['dsn' => 'null://null']]);
         $this->assertTrue(is_object($mailer->getSymfonyMailer()), 'Unable to get Symfony mailer instance!');
     }
 }

@@ -1,10 +1,18 @@
 Yii Framework 2 Symfony mailer extension Change Log
 ================================================
 
-2.0.3 under development
+2.0.4 under development
 -----------------------
 
 - Fix #20: Remove final from Mailer and Message class (Krakozaber)
+- Enh #22: Added an exception if there is no transport configuration (Krakozaber)
+- Enh #24: Allow using a custom HttpClient  (Krakozaber)
+
+
+2.0.3 February 10, 2022
+-----------------------
+
+- Bug #20: Remove final from Mailer and Message class (Krakozaber)
 
 
 2.0.2 February 03, 2022
