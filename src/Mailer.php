@@ -8,13 +8,11 @@ declare(strict_types=1);
 
 namespace yii\symfonymailer;
 
-use RuntimeException;
 use Symfony\Component\Mailer\Mailer as SymfonyMailer;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\Crypto\DkimSigner;
-use Symfony\Component\Mime\Crypto\SMimeSigner;
 use Yii;
 use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
@@ -28,10 +26,16 @@ class Mailer extends BaseMailer
     public $messageClass = Message::class;
 
     private ?SymfonyMailer $symfonyMailer = null;
-    private ?SymfonyMessageEncrypterInterface $encrypter = null;
+    /**
+     * @see https://symfony.com/doc/current/mailer.html#encrypting-messages
+     */
+    public ?SymfonyMessageEncrypterInterface $encrypter = null;
 
-    private ?SymfonyMessageSignerInterface $signer = null;
-    private array $signerOptions = [];
+    /**
+     * @see https://symfony.com/doc/current/mailer.html#signing-messages
+     */
+    public ?SymfonyMessageSignerInterface $signer = null;
+    public array $signerOptions = [];
     /**
      * @var TransportInterface Symfony transport instance or its array configuration.
      */
@@ -133,37 +137,6 @@ class Mailer extends BaseMailer
             throw new InvalidConfigException('Transport configuration array must contain either "dsn", or "scheme" and "host" keys.');
         }
         return $transport;
-    }
-
-    /**
-     * Returns a new instance with the specified encrypter.
-     *
-     * @param SymfonyMessageEncrypterInterface $encrypter The encrypter instance.
-     * @return self
-     *@see https://symfony.com/doc/current/mailer.html#encrypting-messages
-     *
-     */
-    public function withEncrypter(SymfonyMessageEncrypterInterface $encrypter): self
-    {
-        $new = clone $this;
-        $new->encrypter = $encrypter;
-        return $new;
-    }
-
-    /**
-     * Returns a new instance with the specified signer.
-     *
-     * @param SymfonyMessageSignerInterface $signer The signer instance.
-     * @param array $options The dynamic options for the signer, for example see DKIM signer {@see DkimSigner}.
-     * @see https://symfony.com/doc/current/mailer.html#signing-messages
-     * @return self
-     */
-    public function withSigner(SymfonyMessageSignerInterface $signer, array $options = []): self
-    {
-        $new = clone $this;
-        $new->signer = $signer;
-        $new->signerOptions = $options;
-        return $new;
     }
 
     /**

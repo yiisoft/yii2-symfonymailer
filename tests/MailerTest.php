@@ -45,7 +45,7 @@ final class MailerTest extends TestCase
         $message = new Message();
         $encrypter = $this->getMockBuilder(SymfonyMessageEncrypterInterface::class)->getMock();
         $encrypter->expects($this->once())->method('encrypt')->willReturnCallback(function($message) { return $message; });
-        $mailer = $mailer->withEncrypter($encrypter);
+        $mailer->encrypter = $encrypter;
         $mailer->send($message);
 
     }
@@ -59,7 +59,7 @@ final class MailerTest extends TestCase
         $message = new Message();
         $signer = $this->getMockBuilder(SymfonyMessageSignerInterface::class)->getMock();
         $signer->expects($this->once())->method('sign')->willReturnCallback(function($message) { return $message; });
-        $mailer = $mailer->withSigner($signer);
+        $mailer->signer = $signer;
         $mailer->send($message);
 
     }
