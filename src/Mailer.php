@@ -12,7 +12,6 @@ use Symfony\Component\Mailer\Mailer as SymfonyMailer;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\TransportInterface;
-use Symfony\Component\Mime\Crypto\DkimSigner;
 use Yii;
 use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
