@@ -31,7 +31,8 @@
     },
     "require-dev": {
         "phpunit/phpunit": "9.5.10",
-        "symplify/easy-coding-standard": "^10.1"
+        "symplify/easy-coding-standard": "^10.1",
+        "vimeo/psalm": "^4.22"
     },
     "repositories": [
         {
@@ -43,6 +44,11 @@
         "psr-4": {
             "yii\\symfonymailer\\": "src"
         }
+    },
+    "autoload-dev": {
+        "classmap": [
+            "vendor/yiisoft/yii2/Yii.php"
+        ]
     },
     "extra": {
         "branch-alias": {

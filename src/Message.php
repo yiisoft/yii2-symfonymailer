@@ -13,15 +13,22 @@ use DateTimeInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Header\HeaderInterface;
+use yii\base\InvalidConfigException;
+use yii\helpers\FileHelper;
 use yii\mail\BaseMessage;
 
+/**
+ * @psalm-suppress PropertyNotSetInConstructor
+ * @psalm-type PsalmFileOptions array{fileName?: string, contentType?: string}
+ * @psalm-type PsalmAddressList array<int|string, string>|string
+ */
 class Message extends BaseMessage implements MessageWrapperInterface
 {
     private Email $email;
 
     private string $charset = 'utf-8';
 
-    public function __construct($config = [])
+    public function __construct(array $config = [])
     {
         $this->email = new Email();
         parent::__construct($config);
@@ -53,6 +60,11 @@ class Message extends BaseMessage implements MessageWrapperInterface
         return $this->convertAddressesToStrings($this->email->getFrom());
     }
 
+    /**
+     * @param array<int|string, string>|string $from
+     * @psalm-suppress MoreSpecificImplementedParamType
+     * @psalm-suppress LessSpecificImplementedReturnType
+     */
     public function setFrom($from): self
     {
         $this->email->from(...$this->convertStringsToAddresses($from));
@@ -64,6 +76,11 @@ class Message extends BaseMessage implements MessageWrapperInterface
         return $this->convertAddressesToStrings($this->email->getTo());
     }
 
+    /**
+     * @psalm-suppress MoreSpecificImplementedParamType
+     * @param PsalmAddressList $to
+     * @return $this
+     */
     public function setTo($to): self
     {
         $this->email->to(...$this->convertStringsToAddresses($to));
@@ -75,6 +92,11 @@ class Message extends BaseMessage implements MessageWrapperInterface
         return $this->convertAddressesToStrings($this->email->getReplyTo());
     }
 
+    /**
+     * @psalm-suppress MoreSpecificImplementedParamType
+     * @param PsalmAddressList $replyTo
+     * @return $this
+     */
     public function setReplyTo($replyTo): self
     {
         $this->email->replyTo(...$this->convertStringsToAddresses($replyTo));
@@ -86,6 +108,11 @@ class Message extends BaseMessage implements MessageWrapperInterface
         return $this->convertAddressesToStrings($this->email->getCc());
     }
 
+    /**
+     * @psalm-suppress MoreSpecificImplementedParamType
+     * @param PsalmAddressList $cc
+     * @return $this
+     */
     public function setCc($cc): self
     {
         $this->email->cc(...$this->convertStringsToAddresses($cc));
@@ -97,6 +124,11 @@ class Message extends BaseMessage implements MessageWrapperInterface
         return $this->convertAddressesToStrings($this->email->getBcc());
     }
 
+    /**
+     * @psalm-suppress MoreSpecificImplementedParamType
+     * @param PsalmAddressList $bcc The type defined by the message interface is not strict enough
+     * @return $this
+     */
     public function setBcc($bcc): self
     {
         $this->email->bcc(...$this->convertStringsToAddresses($bcc));
@@ -172,88 +204,67 @@ class Message extends BaseMessage implements MessageWrapperInterface
         return $this;
     }
 
-    public function attach($fileName, array $options = [])
+    /**
+     * @param string $fileName
+     * @param PsalmFileOptions $options
+     * @psalm-suppress MoreSpecificImplementedParamType The real expected type is defined in human readable text only
+     * @return $this
+     */
+    public function attach($fileName, array $options = []): self
     {
-        $file = [];
-        if (! empty($options['fileName'])) {
-            $file['name'] = $options['fileName'];
-        } else {
-            $file['name'] = $fileName;
-        }
-
-        if (! empty($options['contentType'])) {
-            $file['contentType'] = $options['contentType'];
-        } else {
-            $file['contentType'] = mime_content_type($fileName);
-        }
-
-        $this->email->attachFromPath($fileName, $file['name'], $file['contentType']);
+        $this->email->attachFromPath(
+            $fileName,
+            $options['fileName'] ?? $fileName,
+            $options['contentType'] ?? FileHelper::getMimeType($fileName)
+        );
         return $this;
     }
 
-    public function attachContent($content, array $options = [])
+    /**
+     * @param resource|string $content
+     * @param PsalmFileOptions $options
+     * @psalm-suppress MoreSpecificImplementedParamType The real expected type is defined in human readable text only
+     * @return $this
+     */
+    public function attachContent($content, array $options = []): self
     {
-        $file = [];
-        if (! empty($options['fileName'])) {
-            $file['name'] = $options['fileName'];
-        } else {
-            $file['name'] = null;
-        }
-
-        if (! empty($options['contentType'])) {
-            $file['contentType'] = $options['contentType'];
-        } else {
-            $file['contentType'] = null;
-        }
-
-        $this->email->attach($content, $file['name'], $file['contentType']);
+        $this->email->attach($content, $options['fileName'] ?? null, $options['contentType'] ?? null);
         return $this;
     }
 
-    public function embed($fileName, array $options = [])
+    /**
+     * @param string $fileName
+     * @param PsalmFileOptions $options
+     * @psalm-suppress MoreSpecificImplementedParamType The real expected type is defined in human readable text only
+     */
+    public function embed($fileName, array $options = []): string
     {
-        $file = [];
-        if (! empty($options['fileName'])) {
-            $file['name'] = $options['fileName'];
-        } else {
-            $file['name'] = $fileName;
-        }
-
-        if (! empty($options['contentType'])) {
-            $file['contentType'] = $options['contentType'];
-        } else {
-            $file['contentType'] = mime_content_type($fileName);
-        }
-
-        $this->email->embedFromPath($fileName, $file['name'], $file['contentType']);
-        return 'cid:' . $file['name'];
+        $name = $options['fileName'] ?? $fileName;
+        $this->email->embedFromPath(
+            $fileName,
+            $name,
+            $options['contentType'] ?? FileHelper::getMimeType($fileName)
+        );
+        return 'cid:' . $name;
     }
 
-    public function embedContent($content, array $options = [])
+    /**
+     * @param resource|string $content
+     * @param PsalmFileOptions $options
+     * @psalm-suppress MoreSpecificImplementedParamType The real expected type is defined in human readable text only
+     */
+    public function embedContent($content, array $options = []): string
     {
-        $file = [];
-        if (! empty($options['fileName'])) {
-            $file['name'] = $options['fileName'];
-        } else {
-            $file['name'] = null;
+        if (empty($options['fileName'])) {
+            throw new InvalidConfigException('A valid file name must be passed when embedding content');
         }
-
-        if (! empty($options['contentType'])) {
-            $file['contentType'] = $options['contentType'];
-        } else {
-            $file['contentType'] = null;
-        }
-
-        $this->email->embed($content, $file['name'], $file['contentType']);
-        return 'cid:' . $file['name'];
+        $this->email->embed($content, $options['fileName'], $options['contentType'] ?? null);
+        return 'cid:' . $options['fileName'];
     }
 
-    public function getHeader($name): array
+    public function getHeader(string $name): array
     {
         $headers = $this->email->getHeaders();
-        if (! $headers->has($name)) {
-            return [];
-        }
 
         $values = [];
 
@@ -265,19 +276,20 @@ class Message extends BaseMessage implements MessageWrapperInterface
         return $values;
     }
 
-    public function addHeader($name, $value): self
+    public function addHeader(string $name, string $value): self
     {
         $this->email->getHeaders()->addTextHeader($name, $value);
         return $this;
     }
 
-    public function setHeader($name, $value): self
+    /**
+     * @param string|list<string> $value
+     */
+    public function setHeader(string $name, $value): self
     {
         $headers = $this->email->getHeaders();
 
-        if ($headers->has($name)) {
-            $headers->remove($name);
-        }
+        $headers->remove($name);
 
         foreach ((array) $value as $v) {
             $headers->addTextHeader($name, $v);
@@ -286,7 +298,11 @@ class Message extends BaseMessage implements MessageWrapperInterface
         return $this;
     }
 
-    public function setHeaders($headers): self
+    /**
+     * @param array<string, string|list<string>> $headers
+     * @return $this
+     */
+    public function setHeaders(array $headers): self
     {
         foreach ($headers as $name => $value) {
             $this->setHeader($name, $value);
@@ -337,13 +353,9 @@ class Message extends BaseMessage implements MessageWrapperInterface
      */
     private function convertStringsToAddresses($strings): array
     {
-        if (is_string($strings)) {
-            return [new Address($strings)];
-        }
-
         $addresses = [];
 
-        foreach ($strings as $address => $name) {
+        foreach ((array) $strings as $address => $name) {
             if (! is_string($address)) {
                 // email address without name
                 $addresses[] = new Address($name);

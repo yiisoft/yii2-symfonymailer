@@ -10,7 +10,7 @@ use Symfony\Component\Mime\Message;
 /**
  * @codeCoverageIgnore This class is a trivial proxy that requires no testing
  */
-class SMimeMessageSigner implements SymfonyMessageSignerInterface
+class SMimeMessageSigner implements MessageSignerInterface
 {
     private SMimeSigner $signer;
 

@@ -15,8 +15,13 @@ use Symfony\Component\Mailer\Transport\TransportInterface;
 use Yii;
 use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
+use yii\log\Logger as YiiLogger;
 use yii\mail\BaseMailer;
 
+/**
+ * @psalm-suppress PropertyNotSetInConstructor
+ * @psalm-type PsalmTransportConfig array{scheme?:string, host?:string, username?:string, password?:string, port?:int, options?: array, dsn?:string }
+ */
 class Mailer extends BaseMailer
 {
     /**
@@ -39,9 +44,9 @@ class Mailer extends BaseMailer
     public array $signerOptions = [];
 
     /**
-     * @var TransportInterface Symfony transport instance or its array configuration.
+     * @var null|TransportInterface Symfony transport instance or its array configuration.
      */
-    private TransportInterface $_transport;
+    private ?TransportInterface $_transport = null;
 
     public Transport $transportFactory;
 
@@ -66,7 +71,7 @@ class Mailer extends BaseMailer
     }
 
     /**
-     * @param array|TransportInterface $transport
+     * @param PsalmTransportConfig|TransportInterface $transport
      * @throws InvalidConfigException on invalid argument.
      */
     public function setTransport($transport): void
@@ -82,23 +87,30 @@ class Mailer extends BaseMailer
 
     private function getTransport(): TransportInterface
     {
+        /** @psalm-suppress RedundantPropertyInitializationCheck Yii2 configuration flow does not guarantee full initialisation */
         if (! isset($this->_transport)) {
             throw new InvalidConfigException('No transport was configured.');
         }
         return $this->_transport;
     }
 
-    public function init()
+    public function init(): void
     {
+        /** @psalm-suppress RedundantPropertyInitializationCheck Yii2 configuration flow does not guarantee full initialisation */
         $this->transportFactory = $this->transportFactory ?? $this->createTransportFactory();
     }
 
     private function createTransportFactory(): Transport
     {
         $defaultFactories = Transport::getDefaultFactories();
+        /** @psalm-suppress InvalidArgument Symfony's type annotation is wrong */
         return new Transport($defaultFactories);
     }
 
+    /**
+     * @param PsalmTransportConfig $config
+     * @throws InvalidConfigException
+     */
     private function createTransport(array $config = []): TransportInterface
     {
         if (array_key_exists('dsn', $config)) {
@@ -109,7 +121,7 @@ class Mailer extends BaseMailer
                 $config['host'],
                 $config['username'] ?? '',
                 $config['password'] ?? '',
-                $config['port'] ?? '',
+                $config['port'] ?? null,
                 $config['options'] ?? [],
             );
             $transport = $this->transportFactory->fromDsnObject($dsn);
@@ -140,7 +152,10 @@ class Mailer extends BaseMailer
             }
             $this->getSymfonyMailer()->send($message);
         } catch (\Exception $exception) {
-            Yii::getLogger()->log($exception->getMessage(), \yii\log\Logger::LEVEL_ERROR, __METHOD__);
+            $logger = Yii::getLogger();
+            if ($logger instanceof YiiLogger) {
+                $logger->log($exception->getMessage(), YiiLogger::LEVEL_ERROR, __METHOD__);
+            }
             return false;
         }
         return true;

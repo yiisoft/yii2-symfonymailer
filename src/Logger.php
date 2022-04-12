@@ -20,10 +20,16 @@ final class Logger implements LoggerInterface
 
     private YiiLogger $logger;
 
+    /**
+     * @var array<string, int>
+     */
     private array $map;
 
     private string $category;
 
+    /**
+     * @param array<string, int> $map
+     */
     public function __construct(YiiLogger $logger, array $map = [
         LogLevel::ERROR => YiiLogger::LEVEL_ERROR,
         LogLevel::CRITICAL => YiiLogger::LEVEL_ERROR,
@@ -51,10 +57,13 @@ final class Logger implements LoggerInterface
      */
     public function log($level, $message, array $context = []): void
     {
+        if (! is_string($level)) {
+            throw new \InvalidArgumentException("This logger only supports string levels");
+        }
         if (! isset($this->map[$level])) {
             throw new InvalidArgumentException("Unknown logging level $level");
         }
 
-        $this->logger->log($message, $this->map[$level], $this->category);
+        $this->logger->log((string) $message, $this->map[$level], $this->category);
     }
 }
