@@ -81,10 +81,7 @@ class Mailer extends BaseMailer
         $this->symfonyMailer = null;
     }
 
-    /**
-     * @deprecated This will become private
-     */
-    public function getTransport(): TransportInterface
+    private function getTransport(): TransportInterface
     {
         if (! isset($this->_transport)) {
             throw new InvalidConfigException('No transport was configured.');

@@ -121,16 +121,6 @@ final class MailerTest extends TestCase
         $mailer->setTransport(new \stdClass());
     }
 
-    /**
-     * @deprecated This test should be removed when `getTransport` is made private
-     */
-    public function testGetTransportThrowsExceptionIfNotConfigured(): void
-    {
-        $mailer = new Mailer();
-        $this->expectException(InvalidConfigException::class);
-        $mailer->getTransport();
-    }
-
     public function testSendMessageThrowsOnBadMessageType(): void
     {
         $mailer = new Mailer();
