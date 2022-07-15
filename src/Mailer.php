@@ -80,7 +80,7 @@ class Mailer extends BaseMailer
             $this->_transport = $transport;
         } elseif (is_array($transport)) {
             $this->_transport = $deferred
-                ? $this->_transport
+                ? $transport
                 : $this->createTransport($transport);
         }
 
