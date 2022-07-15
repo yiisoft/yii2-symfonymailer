@@ -46,6 +46,13 @@ class Mailer extends BaseMailer
      * @see Logger
      */
     public bool $enableMailerLogging = false;
+
+    /**
+     * @var bool whether to defer transport object initialization directly before message sending, if
+     * transport parameters passed as array configuration. This behavior may be required if mailer should
+     * work within queue.
+     */
+    public bool $deferTransportInitialization = false;
     /**
      * Creates Symfony mailer instance.
      * @return SymfonyMailer mailer instance.
@@ -68,10 +75,9 @@ class Mailer extends BaseMailer
 
     /**
      * @param array|TransportInterface $transport
-     * @param bool $deferred Defer transport object initialization, if transport passed as array configuration
      * @throws InvalidConfigException on invalid argument.
      */
-    public function setTransport($transport, $deferred = false): void
+    public function setTransport($transport): void
     {
         if (!is_array($transport) && !$transport instanceof TransportInterface) {
             throw new InvalidConfigException('"' . get_class($this) . '::transport" should be either object or array, "' . gettype($transport) . '" given.');
@@ -79,7 +85,7 @@ class Mailer extends BaseMailer
         if ($transport instanceof TransportInterface) {
             $this->_transport = $transport;
         } elseif (is_array($transport)) {
-            $this->_transport = $deferred
+            $this->_transport = $this->deferTransportInitialization
                 ? $transport
                 : $this->createTransport($transport);
         }
@@ -209,7 +215,7 @@ class Mailer extends BaseMailer
                 : $this->signer->sign($message)
             ;
         }
-        if (is_array($this->_transport)) {
+        if ($this->deferTransportInitialization && is_array($this->_transport)) {
             $this->_transport = $this->createTransport($this->_transport);
         }
         try {
