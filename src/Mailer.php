@@ -215,9 +215,7 @@ class Mailer extends BaseMailer
                 : $this->signer->sign($message)
             ;
         }
-        if ($this->deferTransportInitialization && is_array($this->_transport)) {
-            $this->_transport = $this->createTransport($this->_transport);
-        }
+
         try {
             $this->getSymfonyMailer()->send($message);
         } catch (\Exception $exception) {
