@@ -46,6 +46,13 @@ class Mailer extends BaseMailer
      * @see Logger
      */
     public bool $enableMailerLogging = false;
+
+    /**
+     * @var bool whether to defer transport object initialization directly before message sending, if
+     * transport parameters passed as array configuration. This behavior may be required if mailer should
+     * work within queue.
+     */
+    public bool $deferTransportInitialization = false;
     /**
      * Creates Symfony mailer instance.
      * @return SymfonyMailer mailer instance.
@@ -78,7 +85,9 @@ class Mailer extends BaseMailer
         if ($transport instanceof TransportInterface) {
             $this->_transport = $transport;
         } elseif (is_array($transport)) {
-            $this->_transport = $this->createTransport($transport);
+            $this->_transport = $this->deferTransportInitialization
+                ? $transport
+                : $this->createTransport($transport);
         }
 
         $this->symfonyMailer = null;
