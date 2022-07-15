@@ -68,9 +68,10 @@ class Mailer extends BaseMailer
 
     /**
      * @param array|TransportInterface $transport
+     * @param bool $deferred Defer transport object initialization, if transport passed as array configuration
      * @throws InvalidConfigException on invalid argument.
      */
-    public function setTransport($transport): void
+    public function setTransport($transport, $deferred = false): void
     {
         if (!is_array($transport) && !$transport instanceof TransportInterface) {
             throw new InvalidConfigException('"' . get_class($this) . '::transport" should be either object or array, "' . gettype($transport) . '" given.');
@@ -78,7 +79,9 @@ class Mailer extends BaseMailer
         if ($transport instanceof TransportInterface) {
             $this->_transport = $transport;
         } elseif (is_array($transport)) {
-            $this->_transport = $this->createTransport($transport);
+            $this->_transport = $deferred
+                ? $this->_transport
+                : $this->createTransport($transport);
         }
 
         $this->symfonyMailer = null;
@@ -205,6 +208,9 @@ class Mailer extends BaseMailer
                 ? $this->signer->sign($message, $this->dkimSignerOptions)
                 : $this->signer->sign($message)
             ;
+        }
+        if (is_array($this->_transport)) {
+            $this->_transport = $this->createTransport($this->_transport);
         }
         try {
             $this->getSymfonyMailer()->send($message);
