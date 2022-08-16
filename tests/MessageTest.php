@@ -343,6 +343,14 @@ final class MessageTest extends TestCase
         $this->assertEquals($message->getSymfonyEmail(), $unserializedMessage->getSymfonyEmail(), 'Unable to unserialize message!');
     }
 
+    public function testThatSerializeDoesNotSerializeMailer(): void
+    {
+        $message = $this->createTestMessage();
+        $message->mailer = 'testvalue';
+
+        $unserializedMessage = unserialize(serialize($message));
+        $this->assertNull($unserializedMessage->mailer);
+    }
     /**
      * @depends testSendAlternativeBody
      */

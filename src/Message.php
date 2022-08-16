@@ -39,7 +39,7 @@ class Message extends BaseMessage implements MessageWrapperInterface
         $this->email = clone $this->email;
     }
 
-    public function __sleep()
+    public function __sleep(): array
     {
         return ['email', 'charset'];
     }
