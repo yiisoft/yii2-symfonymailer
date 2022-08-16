@@ -141,23 +141,15 @@ class Mailer extends BaseMailer
             ));
         }
 
-        try {
-            $message = $message->getSymfonyEmail();
-            if ($this->encrypter !== null) {
-                $message = $this->encrypter->encrypt($message);
-            }
-
-            if ($this->signer !== null) {
-                $message = $this->signer->sign($message, $this->signerOptions);
-            }
-            $this->getSymfonyMailer()->send($message);
-        } catch (\Exception $exception) {
-            $logger = Yii::getLogger();
-            if ($logger instanceof YiiLogger) {
-                $logger->log($exception->getMessage(), YiiLogger::LEVEL_ERROR, __METHOD__);
-            }
-            return false;
+        $message = $message->getSymfonyEmail();
+        if ($this->encrypter !== null) {
+            $message = $this->encrypter->encrypt($message);
         }
+
+        if ($this->signer !== null) {
+            $message = $this->signer->sign($message, $this->signerOptions);
+        }
+        $this->getSymfonyMailer()->send($message);
         return true;
     }
 }

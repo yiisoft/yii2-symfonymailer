@@ -43,6 +43,11 @@ final class MailerTest extends TestCase
         $mailer->transport = new Transport\NullTransport();
 
         $message = new Message();
+        $message
+            ->setHtmlBody('htmlbody')
+            ->setFrom('test@test.com')
+            ->setTo('test@test.com')
+        ;
         $encrypter = $this->getMockBuilder(MessageEncrypterInterface::class)->getMock();
         $encrypter->expects($this->once())->method('encrypt')->willReturnCallback(function ($message) {
             return $message;
@@ -57,6 +62,12 @@ final class MailerTest extends TestCase
         $mailer->transport = new Transport\NullTransport();
 
         $message = new Message();
+        $message
+            ->setHtmlBody('htmlbody')
+            ->setFrom('test@test.com')
+            ->setTo('test@test.com')
+        ;
+
         $signer = $this->getMockBuilder(MessageSignerInterface::class)->getMock();
         $signer->expects($this->once())->method('sign')->willReturnCallback(function ($message) {
             return $message;
