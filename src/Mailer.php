@@ -15,7 +15,6 @@ use Symfony\Component\Mailer\Transport\TransportInterface;
 use Yii;
 use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
-use yii\log\Logger as YiiLogger;
 use yii\mail\BaseMailer;
 
 /**
