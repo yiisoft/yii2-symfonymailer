@@ -64,7 +64,7 @@ class Mailer extends BaseMailer
      */
     private function getSymfonyMailer(): SymfonyMailer
     {
-        if (! isset($this->symfonyMailer)) {
+        if (!isset($this->symfonyMailer)) {
             $this->symfonyMailer = $this->createSymfonyMailer();
         }
         return $this->symfonyMailer;
@@ -76,7 +76,7 @@ class Mailer extends BaseMailer
      */
     public function setTransport($transport): void
     {
-        if (! is_array($transport) && ! $transport instanceof TransportInterface) {
+        if (!is_array($transport) && !$transport instanceof TransportInterface) {
             throw new InvalidArgumentException('"' . get_class($this) . '::transport" should be either object or array, "' . gettype($transport) . '" given.');
         }
 
@@ -88,7 +88,7 @@ class Mailer extends BaseMailer
     private function getTransport(): TransportInterface
     {
         /** @psalm-suppress RedundantPropertyInitializationCheck Yii2 configuration flow does not guarantee full initialisation */
-        if (! isset($this->_transport)) {
+        if (!isset($this->_transport)) {
             throw new InvalidConfigException('No transport was configured.');
         }
         return $this->_transport;
@@ -133,7 +133,7 @@ class Mailer extends BaseMailer
 
     protected function sendMessage($message): bool
     {
-        if (! ($message instanceof MessageWrapperInterface)) {
+        if (!($message instanceof MessageWrapperInterface)) {
             throw new InvalidArgumentException(sprintf(
                 'The message must be an instance of "%s". The "%s" instance is received.',
                 MessageWrapperInterface::class,

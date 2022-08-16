@@ -356,7 +356,7 @@ class Message extends BaseMessage implements MessageWrapperInterface
         $addresses = [];
 
         foreach ((array) $strings as $address => $name) {
-            if (! is_string($address)) {
+            if (!is_string($address)) {
                 // email address without name
                 $addresses[] = new Address($name);
                 continue;

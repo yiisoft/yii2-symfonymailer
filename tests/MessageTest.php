@@ -33,7 +33,7 @@ final class MessageTest extends TestCase
             ],
         ]);
         $filePath = $this->getTestFilePath();
-        if (! file_exists($filePath)) {
+        if (!file_exists($filePath)) {
             FileHelper::createDirectory($filePath);
         }
     }
@@ -82,7 +82,7 @@ final class MessageTest extends TestCase
      */
     private function createImageFile($fileName = 'test.jpg', $text = 'Test Image'): string
     {
-        if (! function_exists('imagecreatetruecolor')) {
+        if (!function_exists('imagecreatetruecolor')) {
             $this->markTestSkipped('GD lib required.');
         }
         $fileFullName = $this->getTestFilePath() . DIRECTORY_SEPARATOR . $fileName;

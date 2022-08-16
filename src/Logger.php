@@ -57,10 +57,10 @@ final class Logger implements LoggerInterface
      */
     public function log($level, $message, array $context = []): void
     {
-        if (! is_string($level)) {
+        if (!is_string($level)) {
             throw new \InvalidArgumentException("This logger only supports string levels");
         }
-        if (! isset($this->map[$level])) {
+        if (!isset($this->map[$level])) {
             throw new InvalidArgumentException("Unknown logging level $level");
         }
 
