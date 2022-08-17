@@ -47,7 +47,7 @@ class Mailer extends BaseMailer
      */
     private ?TransportInterface $_transport = null;
 
-    public Transport $transportFactory;
+    public ?Transport $transportFactory = null;
 
     /**
      * Creates Symfony mailer instance.
@@ -93,8 +93,11 @@ class Mailer extends BaseMailer
         return $this->_transport;
     }
 
-    private function createTransportFactory(): Transport
+    private function getTransportFactory(): Transport
     {
+        if (isset($this->transportFactory)) {
+            return $this->transportFactory;
+        }
         $defaultFactories = Transport::getDefaultFactories();
         /** @psalm-suppress InvalidArgument Symfony's type annotation is wrong */
         return new Transport($defaultFactories);
@@ -106,10 +109,9 @@ class Mailer extends BaseMailer
      */
     private function createTransport(array $config = []): TransportInterface
     {
-        /** @psalm-suppress RedundantPropertyInitializationCheck Yii2 configuration flow does not guarantee full initialisation */
-        $this->transportFactory = $this->transportFactory ?? $this->createTransportFactory();
+        $transportFactory = $this->getTransportFactory();
         if (array_key_exists('dsn', $config)) {
-            $transport = $this->transportFactory->fromString($config['dsn']);
+            $transport = $transportFactory->fromString($config['dsn']);
         } elseif (array_key_exists('scheme', $config) && array_key_exists('host', $config)) {
             $dsn = new Dsn(
                 $config['scheme'],
@@ -119,7 +121,7 @@ class Mailer extends BaseMailer
                 $config['port'] ?? null,
                 $config['options'] ?? [],
             );
-            $transport = $this->transportFactory->fromDsnObject($dsn);
+            $transport = $transportFactory->fromDsnObject($dsn);
         } else {
             throw new InvalidConfigException('Transport configuration array must contain either "dsn", or "scheme" and "host" keys.');
         }
