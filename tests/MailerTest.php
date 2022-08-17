@@ -115,10 +115,9 @@ final class MailerTest extends TestCase
         ];
         $mailer = Yii::createObject([
             'class' => Mailer::class,
-            'transport' => $transportConfig
+            'transport' => $transportConfig,
         ]);
         $this->assertInstanceOf(Mailer::class, $mailer);
-
     }
 
     public function testConfigureTransportInvalidArray(): void
