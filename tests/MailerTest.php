@@ -101,6 +101,26 @@ final class MailerTest extends TestCase
         $mailer->setTransport($transportConfig);
     }
 
+    public function testConfigureTransportFromArrayWithYii(): void
+    {
+        $transportConfig = [
+            'scheme' => 'smtp',
+            'host' => 'localhost',
+            'username' => 'username',
+            'password' => 'password',
+            'port' => 465,
+            'options' => [
+                'ssl' => true,
+            ],
+        ];
+        $mailer = Yii::createObject([
+            'class' => Mailer::class,
+            'transport' => $transportConfig
+        ]);
+        $this->assertInstanceOf(Mailer::class, $mailer);
+
+    }
+
     public function testConfigureTransportInvalidArray(): void
     {
         $transportConfig = [

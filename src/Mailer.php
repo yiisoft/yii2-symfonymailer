@@ -93,12 +93,6 @@ class Mailer extends BaseMailer
         return $this->_transport;
     }
 
-    public function init(): void
-    {
-        /** @psalm-suppress RedundantPropertyInitializationCheck Yii2 configuration flow does not guarantee full initialisation */
-        $this->transportFactory = $this->transportFactory ?? $this->createTransportFactory();
-    }
-
     private function createTransportFactory(): Transport
     {
         $defaultFactories = Transport::getDefaultFactories();
@@ -112,6 +106,8 @@ class Mailer extends BaseMailer
      */
     private function createTransport(array $config = []): TransportInterface
     {
+        /** @psalm-suppress RedundantPropertyInitializationCheck Yii2 configuration flow does not guarantee full initialisation */
+        $this->transportFactory = $this->transportFactory ?? $this->createTransportFactory();
         if (array_key_exists('dsn', $config)) {
             $transport = $this->transportFactory->fromString($config['dsn']);
         } elseif (array_key_exists('scheme', $config) && array_key_exists('host', $config)) {
