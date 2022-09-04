@@ -1,6 +1,12 @@
 Yii Framework 2 Symfony mailer extension Change Log
 ================================================
 
+2.0.5 under development
+-----------------------
+
+- no changes in this release.
+
+
 2.0.4 September 04, 2022
 ------------------------
 
