@@ -1,8 +1,8 @@
 Yii Framework 2 Symfony mailer extension Change Log
 ================================================
 
-2.0.4 under development
------------------------
+2.0.4 September 04, 2022
+------------------------
 
 - Enh #22: Added an exception if there is no transport configuration (Krakozaber)
 
