@@ -30,7 +30,11 @@
         "symfony/mailer": ">=5.4.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "9.5.10"
+        "phpunit/phpunit": "9.5.10",
+        "symplify/easy-coding-standard": "^10.1",
+        "vimeo/psalm": "^4.22",
+        "captainhook/captainhook": "^5.10",
+        "captainhook/plugin-composer": "^5.3"
     },
     "repositories": [
         {
@@ -43,6 +47,11 @@
             "yii\\symfonymailer\\": "src"
         }
     },
+    "autoload-dev": {
+        "classmap": [
+            "vendor/yiisoft/yii2/Yii.php"
+        ]
+    },
     "extra": {
         "branch-alias": {
             "dev-master": "2.0.x-dev"
@@ -50,7 +59,8 @@
     },
     "config": {
         "allow-plugins": {
-            "yiisoft/yii2-composer": true
+            "yiisoft/yii2-composer": true,
+            "captainhook/plugin-composer": true
         }
     }
 }

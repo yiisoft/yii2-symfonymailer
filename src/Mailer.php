@@ -4,22 +4,23 @@
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license https://www.yiiframework.com/license/
  */
+declare(strict_types=1);
 
 namespace yii\symfonymailer;
 
-use RuntimeException;
 use Symfony\Component\Mailer\Mailer as SymfonyMailer;
-use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\TransportInterface;
-use Symfony\Component\Mime\Crypto\DkimSigner;
-use Symfony\Component\Mime\Crypto\SMimeEncrypter;
-use Symfony\Component\Mime\Crypto\SMimeSigner;
 use Yii;
+use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
 use yii\mail\BaseMailer;
 
+/**
+ * @psalm-suppress PropertyNotSetInConstructor
+ * @psalm-type PsalmTransportConfig array{scheme?:string, host?:string, username?:string, password?:string, port?:int, options?: array, dsn?:string }
+ */
 class Mailer extends BaseMailer
 {
     /**
@@ -28,24 +29,26 @@ class Mailer extends BaseMailer
     public $messageClass = Message::class;
 
     private ?SymfonyMailer $symfonyMailer = null;
-    private ?SMimeEncrypter $encryptor = null;
-    /**
-     * @var DkimSigner|SMimeSigner|null
-     */
-    private $signer = null;
-    private array $dkimSignerOptions = [];
-    /**
-     * @var TransportInterface|array Symfony transport instance or its array configuration.
-     */
-    private $_transport = [];
-
 
     /**
-     * @var bool whether to enable writing of the Mailer internal logs using Yii log mechanism.
-     * If enabled [[Logger]] plugin will be attached to the [[transport]] for this purpose.
-     * @see Logger
+     * @see https://symfony.com/doc/current/mailer.html#encrypting-messages
      */
-    public bool $enableMailerLogging = false;
+    public ?MessageEncrypterInterface $encrypter = null;
+
+    /**
+     * @see https://symfony.com/doc/current/mailer.html#signing-messages
+     */
+    public ?MessageSignerInterface $signer = null;
+
+    public array $signerOptions = [];
+
+    /**
+     * @var null|TransportInterface Symfony transport instance or its array configuration.
+     */
+    private ?TransportInterface $_transport = null;
+
+    public ?Transport $transportFactory = null;
+
     /**
      * Creates Symfony mailer instance.
      * @return SymfonyMailer mailer instance.
@@ -58,160 +61,92 @@ class Mailer extends BaseMailer
     /**
      * @return SymfonyMailer Swift mailer instance
      */
-    public function getSymfonyMailer(): SymfonyMailer
+    private function getSymfonyMailer(): SymfonyMailer
     {
-        if (!is_object($this->symfonyMailer)) {
+        if (!isset($this->symfonyMailer)) {
             $this->symfonyMailer = $this->createSymfonyMailer();
         }
         return $this->symfonyMailer;
     }
 
     /**
-     * @param array|TransportInterface $transport
+     * @param PsalmTransportConfig|TransportInterface $transport
      * @throws InvalidConfigException on invalid argument.
      */
     public function setTransport($transport): void
     {
         if (!is_array($transport) && !$transport instanceof TransportInterface) {
-            throw new InvalidConfigException('"' . get_class($this) . '::transport" should be either object or array, "' . gettype($transport) . '" given.');
+            throw new InvalidArgumentException('"' . get_class($this) . '::transport" should be either object or array, "' . gettype($transport) . '" given.');
         }
-        if ($transport instanceof TransportInterface) {
-            $this->_transport = $transport;
-        } elseif (is_array($transport)) {
-            $this->_transport = $this->createTransport($transport);
-        }
+
+        $this->_transport = $transport instanceof TransportInterface ? $transport : $this->createTransport($transport);
 
         $this->symfonyMailer = null;
     }
 
-    /**
-     * @return TransportInterface
-     */
-    public function getTransport(): TransportInterface
+    private function getTransport(): TransportInterface
     {
-        if (!is_object($this->_transport)) {
-            $this->_transport = $this->createTransport($this->_transport);
+        /** @psalm-suppress RedundantPropertyInitializationCheck Yii2 configuration flow does not guarantee full initialisation */
+        if (!isset($this->_transport)) {
+            throw new InvalidConfigException('No transport was configured.');
         }
         return $this->_transport;
     }
 
+    private function getTransportFactory(): Transport
+    {
+        if (isset($this->transportFactory)) {
+            return $this->transportFactory;
+        }
+        $defaultFactories = Transport::getDefaultFactories();
+        /** @psalm-suppress InvalidArgument Symfony's type annotation is wrong */
+        return new Transport($defaultFactories);
+    }
+
+    /**
+     * @param PsalmTransportConfig $config
+     * @throws InvalidConfigException
+     */
     private function createTransport(array $config = []): TransportInterface
     {
-        if (array_key_exists('enableMailerLogging', $config)) {
-            $this->enableMailerLogging = $config['enableMailerLogging'];
-            unset($config['enableMailerLogging']);
-        }
-
-        $logger = null;
-        if ($this->enableMailerLogging) {
-            $logger = new Logger();
-        }
-
-        $defaultFactories = Transport::getDefaultFactories(null, null, $logger);
-        $transportObj = new Transport($defaultFactories);
-
+        $transportFactory = $this->getTransportFactory();
         if (array_key_exists('dsn', $config)) {
-            $transport = $transportObj->fromString($config['dsn']);
-        } elseif(array_key_exists('scheme', $config) && array_key_exists('host', $config)) {
+            $transport = $transportFactory->fromString($config['dsn']);
+        } elseif (array_key_exists('scheme', $config) && array_key_exists('host', $config)) {
             $dsn = new Dsn(
                 $config['scheme'],
                 $config['host'],
                 $config['username'] ?? '',
                 $config['password'] ?? '',
-                $config['port'] ?? '',
+                $config['port'] ?? null,
                 $config['options'] ?? [],
             );
-            $transport = $transportObj->fromDsnObject($dsn);
+            $transport = $transportFactory->fromDsnObject($dsn);
         } else {
             throw new InvalidConfigException('Transport configuration array must contain either "dsn", or "scheme" and "host" keys.');
         }
         return $transport;
     }
 
-
-    /**
-     * Returns a new instance with the specified encryptor.
-     *
-     * @param SMimeEncrypter $encryptor The encryptor instance.
-     *
-     * @see https://symfony.com/doc/current/mailer.html#encrypting-messages
-     *
-     * @return self
-     */
-    public function withEncryptor(SMimeEncrypter $encryptor): self
-    {
-        $new = clone $this;
-        $new->encryptor = $encryptor;
-        return $new;
-    }
-
-    /**
-     * Returns a new instance with the specified signer.
-     *
-     * @param DkimSigner|object|SMimeSigner $signer The signer instance.
-     * @param array $options The options for DKIM signer {@see DkimSigner}.
-     *
-     * @throws RuntimeException If the signer is not an instance of {@see DkimSigner} or {@see SMimeSigner}.
-     *
-     * @see https://symfony.com/doc/current/mailer.html#signing-messages
-     *
-     * @return self
-     */
-    public function withSigner(object $signer, array $options = []): self
-    {
-        $new = clone $this;
-
-        if ($signer instanceof DkimSigner) {
-            $new->signer = $signer;
-            $new->dkimSignerOptions = $options;
-            return $new;
-        }
-
-        if ($signer instanceof SMimeSigner) {
-            $new->signer = $signer;
-            return $new;
-        }
-
-        throw new RuntimeException(sprintf(
-            'The signer must be an instance of "%s" or "%s". The "%s" instance is received.',
-            DkimSigner::class,
-            SMimeSigner::class,
-            get_class($signer),
-        ));
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @throws TransportExceptionInterface If sending failed.
-     */
     protected function sendMessage($message): bool
     {
-        if (!($message instanceof Message)) {
-            throw new RuntimeException(sprintf(
+        if (!($message instanceof MessageWrapperInterface)) {
+            throw new InvalidArgumentException(sprintf(
                 'The message must be an instance of "%s". The "%s" instance is received.',
-                Message::class,
+                MessageWrapperInterface::class,
                 get_class($message),
             ));
         }
 
         $message = $message->getSymfonyEmail();
-        if ($this->encryptor !== null) {
-            $message = $this->encryptor->encrypt($message);
+        if ($this->encrypter !== null) {
+            $message = $this->encrypter->encrypt($message);
         }
 
         if ($this->signer !== null) {
-            $message = $this->signer instanceof DkimSigner
-                ? $this->signer->sign($message, $this->dkimSignerOptions)
-                : $this->signer->sign($message)
-            ;
+            $message = $this->signer->sign($message, $this->signerOptions);
         }
-        try {
-            $this->getSymfonyMailer()->send($message);
-        } catch (\Exception $exception) {
-            Yii::getLogger()->log($exception->getMessage(), \yii\log\Logger::LEVEL_ERROR, __METHOD__);
-            return false;
-        }
+        $this->getSymfonyMailer()->send($message);
         return true;
     }
 }

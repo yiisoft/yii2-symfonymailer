@@ -1,72 +1,162 @@
 <?php
 
+declare(strict_types=1);
+
 namespace yiiunit\extensions\symfonymailer;
 
-use Symfony\Component\Mailer\Transport\NullTransportFactory;
+use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Transport\TransportInterface;
+use Symfony\Component\Mime\Crypto\SMimeEncrypter;
 use Yii;
+use yii\base\InvalidArgumentException;
+use yii\base\InvalidConfigException;
+use yii\mail\MessageInterface;
 use yii\symfonymailer\Mailer;
-use Symfony\Component\Mailer\Transport\Dsn;
-use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransportFactory;
+use yii\symfonymailer\Message;
+use yii\symfonymailer\MessageEncrypterInterface;
+use yii\symfonymailer\MessageSignerInterface;
 
 Yii::setAlias('@yii/symfonymailer', __DIR__ . '/../../../../extensions/symfonymailer');
 
-class MailerTest extends TestCase
+/**
+ * @covers \yii\symfonymailer\Mailer
+ */
+final class MailerTest extends TestCase
 {
-    public function setUp(): void
-    {
-        $this->mockApplication([
-            'components' => [
-                'email' => $this->createTestEmailComponent()
-            ]
-        ]);
-    }
-
-    /**
-     * @return Mailer test email component instance.
-     */
-    protected function createTestEmailComponent()
-    {
-        $component = new Mailer();
-
-        return $component;
-    }
-
     // Tests :
+    public function testSetupTransport(): void
+    {
+        $transport = $this->getMockBuilder(TransportInterface::class)->getMock();
+        $transport->expects($this->once())->method('send');
 
-    public function testSetupTransport()
+        $mailer = new Mailer();
+        $mailer->transport = $transport;
+
+        $message = $this->getMockBuilder(Message::class)->getMock();
+        // We test if the correct transport is used
+        $mailer->send($message);
+    }
+
+    public function testSendWithEncryptor(): void
     {
         $mailer = new Mailer();
-        $nullTransportFactory = new NullTransportFactory();
-        $transport = $nullTransportFactory->create(new Dsn('null', 'null'));
-        $mailer->setTransport($transport);
-        $this->assertSame($transport, $mailer->getTransport(), 'Unable to setup transport!');
+        $mailer->transport = new Transport\NullTransport();
+
+        $message = new Message();
+        $message
+            ->setHtmlBody('htmlbody')
+            ->setFrom('test@test.com')
+            ->setTo('test@test.com')
+        ;
+        $encrypter = $this->getMockBuilder(MessageEncrypterInterface::class)->getMock();
+        $encrypter->expects($this->once())->method('encrypt')->willReturnCallback(function ($message) {
+            return $message;
+        });
+        $mailer->encrypter = $encrypter;
+        $mailer->send($message);
+    }
+
+    public function testSendWithSigner(): void
+    {
+        $mailer = new Mailer();
+        $mailer->transport = new Transport\NullTransport();
+
+        $message = new Message();
+        $message
+            ->setHtmlBody('htmlbody')
+            ->setFrom('test@test.com')
+            ->setTo('test@test.com')
+        ;
+
+        $signer = $this->getMockBuilder(MessageSignerInterface::class)->getMock();
+        $signer->expects($this->once())->method('sign')->willReturnCallback(function ($message) {
+            return $message;
+        });
+        $mailer->signer = $signer;
+        $mailer->send($message);
     }
 
     /**
      * @depends testSetupTransport
      */
-    public function testConfigureTransport()
+    public function testConfigureTransportFromArray(): void
     {
-        $mailer = new Mailer();
-
         $transportConfig = [
             'scheme' => 'smtp',
             'host' => 'localhost',
             'username' => 'username',
             'password' => 'password',
             'port' => 465,
-            'options' => ['ssl' => true],
+            'options' => [
+                'ssl' => true,
+            ],
         ];
+        $mailer = new Mailer();
+
+        $factory = $this->getMockBuilder(Transport\TransportFactoryInterface::class)->getMock();
+        $factory->expects($this->atLeastOnce())->method('supports')->willReturn(true);
+        $factory->expects($this->once())->method('create');
+
+        $mailer->transportFactory = new Transport([$factory]);
         $mailer->setTransport($transportConfig);
-        $transport = $mailer->getTransport();
-        $this->assertTrue(is_object($transport), 'Unable to setup transport via config!');
-        $this->assertInstanceOf(TransportInterface::class, $transport, 'Invalid transport class');
     }
 
-    public function testGetSymfonyMailer()
+    public function testConfigureTransportFromArrayWithYii(): void
     {
-        $mailer = new Mailer(['transport' => ['dsn' => 'null://null']]);
-        $this->assertTrue(is_object($mailer->getSymfonyMailer()), 'Unable to get Symfony mailer instance!');
+        $transportConfig = [
+            'scheme' => 'smtp',
+            'host' => 'localhost',
+            'username' => 'username',
+            'password' => 'password',
+            'port' => 465,
+            'options' => [
+                'ssl' => true,
+            ],
+        ];
+        $mailer = Yii::createObject([
+            'class' => Mailer::class,
+            'transport' => $transportConfig,
+        ]);
+        $this->assertInstanceOf(Mailer::class, $mailer);
+    }
+
+    public function testConfigureTransportInvalidArray(): void
+    {
+        $transportConfig = [
+
+        ];
+        $mailer = new Mailer();
+        $this->expectException(InvalidConfigException::class);
+        $mailer->setTransport($transportConfig);
+    }
+
+    public function testConfigureTransportFromString(): void
+    {
+        $mailer = new Mailer();
+
+        $factory = $this->getMockBuilder(Transport\TransportFactoryInterface::class)->getMock();
+        $factory->expects($this->atLeastOnce())->method('supports')->willReturn(true);
+        $factory->expects($this->once())->method('create');
+
+        $mailer->transportFactory = new Transport([$factory]);
+        $mailer->setTransport([
+            'dsn' => 'null://null',
+        ]);
+    }
+
+    public function testSetTransportWithInvalidArgumentThrowsException(): void
+    {
+        $mailer = new Mailer();
+        $this->expectException(InvalidArgumentException::class);
+        $mailer->setTransport(new \stdClass());
+    }
+
+    public function testSendMessageThrowsOnBadMessageType(): void
+    {
+        $mailer = new Mailer();
+        $this->expectException(InvalidArgumentException::class);
+        $message = $this->getMockBuilder(MessageInterface::class)->getMock();
+
+        $mailer->send($message);
     }
 }

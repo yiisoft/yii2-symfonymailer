@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace yiiunit\extensions\symfonymailer;
 
 use Symfony\Component\Mime\Part\DataPart;
@@ -14,21 +16,21 @@ Yii::setAlias('@yii/symfonymailer', __DIR__ . '/../../../../extensions/symfonyma
  * @group vendor
  * @group mail
  * @group symfonymailer
+ * @covers \yii\symfonymailer\Message
  */
-class MessageTest extends TestCase
+final class MessageTest extends TestCase
 {
     /**
      * @var string test email address, which will be used as receiver for the messages.
      */
-    protected $testEmailReceiver = 'someuser@somedomain.com';
-
+    private $testEmailReceiver = 'someuser@somedomain.com';
 
     public function setUp(): void
     {
         $this->mockApplication([
             'components' => [
-                'mailer' => $this->createTestEmailComponent()
-            ]
+                'mailer' => $this->createTestEmailComponent(),
+            ],
         ]);
         $filePath = $this->getTestFilePath();
         if (!file_exists($filePath)) {
@@ -47,7 +49,7 @@ class MessageTest extends TestCase
     /**
      * @return string test file path.
      */
-    protected function getTestFilePath()
+    private function getTestFilePath(): string
     {
         return Yii::getAlias('@yiiunit/extensions/symfonymailer/runtime') . DIRECTORY_SEPARATOR . basename(get_class($this)) . '_' . getmypid();
     }
@@ -55,7 +57,7 @@ class MessageTest extends TestCase
     /**
      * @return Mailer test email component instance.
      */
-    protected function createTestEmailComponent()
+    private function createTestEmailComponent(): Mailer
     {
         $component = new Mailer([
             'useFileTransport' => true,
@@ -67,7 +69,7 @@ class MessageTest extends TestCase
     /**
      * @return Message test message instance.
      */
-    protected function createTestMessage()
+    private function createTestMessage(): Message
     {
         return Yii::$app->get('mailer')->compose();
     }
@@ -78,7 +80,7 @@ class MessageTest extends TestCase
      * @param  string $text     text to be applied on image.
      * @return string image file full name.
      */
-    protected function createImageFile($fileName = 'test.jpg', $text = 'Test Image')
+    private function createImageFile($fileName = 'test.jpg', $text = 'Test Image'): string
     {
         if (!function_exists('imagecreatetruecolor')) {
             $this->markTestSkipped('GD lib required.');
@@ -96,16 +98,7 @@ class MessageTest extends TestCase
 
     // Tests :
 
-    public function testGetSymfonyMessage()
-    {
-        $message = new Message();
-        $this->assertTrue(is_object($message->getSymfonyEmail()), 'Unable to get Symfony email!');
-    }
-
-    /**
-     * @depends testGetSymfonyMessage
-     */
-    public function testSetGet()
+    public function testSetGet(): void
     {
         $message = new Message();
 
@@ -141,26 +134,31 @@ class MessageTest extends TestCase
     /**
      * @depends testSetGet
      */
-    public function testClone()
+    public function testClone(): void
     {
         $m1 = new Message();
         $m1->setFrom('user@example.com');
         $m2 = clone $m1;
-        $m1->setTo(['user1@example.com' => 'user1']);
-        $m2->setTo(['user2@example.com' => 'user2']);
+        $m1->setTo([
+            'user1@example.com' => 'user1',
+        ]);
+        $m2->setTo([
+            'user2@example.com' => 'user2',
+        ]);
 
-        $this->assertEquals(['user1@example.com' => 'user1'], $m1->getTo());
-        $this->assertEquals(['user2@example.com' => 'user2'], $m2->getTo());
+        $this->assertEquals([
+            'user1@example.com' => 'user1',
+        ], $m1->getTo());
+        $this->assertEquals([
+            'user2@example.com' => 'user2',
+        ], $m2->getTo());
 
         $messageWithoutSymfonyInitialized = new Message();
         $m2 = clone $messageWithoutSymfonyInitialized; // should be no error during cloning
         $this->assertTrue($m2 instanceof Message);
     }
 
-    /**
-     * @depends testGetSymfonyMessage
-     */
-    public function testSetupHeaderShortcuts()
+    public function testSetupHeaderShortcuts(): void
     {
         $charset = 'utf-16';
         $subject = 'Test Subject';
@@ -194,10 +192,7 @@ class MessageTest extends TestCase
         $this->assertStringContainsString("X-Priority: 2 (High)", $messageString, 'Incorrect "Priority" header!');
     }
 
-    /**
-     * @depends testGetSymfonyMessage
-     */
-    public function testSend()
+    public function testSend(): void
     {
         $message = $this->createTestMessage();
         $message->setTo($this->testEmailReceiver);
@@ -210,7 +205,7 @@ class MessageTest extends TestCase
     /**
      * @depends testSend
      */
-    public function testAttachFile()
+    public function testAttachFile(): void
     {
         $message = $this->createTestMessage();
 
@@ -231,7 +226,7 @@ class MessageTest extends TestCase
     /**
      * @depends testSend
      */
-    public function testAttachContent()
+    public function testAttachContent(): void
     {
         $message = $this->createTestMessage();
 
@@ -241,7 +236,10 @@ class MessageTest extends TestCase
         $message->setTextBody('Yii Symfony Create Attachment Test body');
         $fileName = 'test.txt';
         $fileContent = 'Test attachment content';
-        $message->attachContent($fileContent, ['fileName' => $fileName, 'contentType' => 'image/png']);
+        $message->attachContent($fileContent, [
+            'fileName' => $fileName,
+            'contentType' => 'image/png',
+        ]);
 
         $this->assertTrue($message->send());
         $attachment = $this->getAttachment($message);
@@ -253,7 +251,7 @@ class MessageTest extends TestCase
     /**
      * @depends testSend
      */
-    public function testEmbedFile()
+    public function testEmbedFile(): void
     {
         $fileName = $this->createImageFile('embed_file.jpg', 'Embed Image File');
 
@@ -265,7 +263,7 @@ class MessageTest extends TestCase
         $message->setTo($this->testEmailReceiver);
         $message->setFrom('someuser@somedomain.com');
         $message->setSubject('Yii Symfony Embed File Test');
-        $message->setHtmlBody('Embed image: <img src="' . $cid. '" alt="pic">');
+        $message->setHtmlBody('Embed image: <img src="' . $cid . '" alt="pic">');
 
         $this->assertTrue($message->send());
 
@@ -278,7 +276,7 @@ class MessageTest extends TestCase
     /**
      * @depends testSend
      */
-    public function testEmbedContent()
+    public function testEmbedContent(): void
     {
         $fileFullName = $this->createImageFile('embed_file.jpg', 'Embed Image File');
         $message = $this->createTestMessage();
@@ -287,14 +285,17 @@ class MessageTest extends TestCase
         $contentType = 'image/jpeg';
         $fileContent = file_get_contents($fileFullName);
 
-        $cid = $message->embedContent($fileContent, ['fileName' => $fileName, 'contentType' => $contentType]);
+        $cid = $message->embedContent($fileContent, [
+            'fileName' => $fileName,
+            'contentType' => $contentType,
+        ]);
         $this->assertIsString($cid);
         $this->assertStringStartsWith('cid:', $cid);
 
         $message->setTo($this->testEmailReceiver);
         $message->setFrom('someuser@somedomain.com');
         $message->setSubject('Yii Symfony Embed File Test');
-        $message->setHtmlBody('Embed image: <img src="' . $cid. '" alt="pic">');
+        $message->setHtmlBody('Embed image: <img src="' . $cid . '" alt="pic">');
 
         $this->assertTrue($message->send());
 
@@ -308,7 +309,7 @@ class MessageTest extends TestCase
     /**
      * @depends testSend
      */
-    public function testSendAlternativeBody()
+    public function testSendAlternativeBody(): void
     {
         $message = $this->createTestMessage();
 
@@ -326,10 +327,7 @@ class MessageTest extends TestCase
         $this->assertStringContainsString('text/html', $body->asDebugString(), 'No HTML!');
     }
 
-    /**
-     * @depends testGetSymfonyMessage
-     */
-    public function testSerialize()
+    public function testSerialize(): void
     {
         $message = $this->createTestMessage();
 
@@ -341,14 +339,22 @@ class MessageTest extends TestCase
         $serializedMessage = serialize($message);
         $this->assertNotEmpty($serializedMessage, 'Unable to serialize message!');
 
-        $unserializedMessaage = unserialize($serializedMessage);
-        $this->assertEquals($message, $unserializedMessaage, 'Unable to unserialize message!');
+        $unserializedMessage = unserialize($serializedMessage);
+        $this->assertEquals($message->getSymfonyEmail(), $unserializedMessage->getSymfonyEmail(), 'Unable to unserialize message!');
     }
 
+    public function testThatSerializeDoesNotSerializeMailer(): void
+    {
+        $message = $this->createTestMessage();
+        $message->mailer = 'testvalue';
+
+        $unserializedMessage = unserialize(serialize($message));
+        $this->assertNull($unserializedMessage->mailer);
+    }
     /**
      * @depends testSendAlternativeBody
      */
-    public function testAlternativeBodyCharset()
+    public function testAlternativeBodyCharset(): void
     {
         $message = $this->createTestMessage();
         $charset = 'windows-1251';
@@ -366,10 +372,7 @@ class MessageTest extends TestCase
         $this->assertEquals(2, substr_count($content, $charset), 'Wrong charset for alternative body override.');
     }
 
-    /**
-     * @depends testGetSymfonyMessage
-     */
-    public function testSetupHeaders()
+    public function testSetupHeaders(): void
     {
         $messageString = $this->createTestMessage()
             ->setTo('to@to.to')
@@ -421,7 +424,7 @@ class MessageTest extends TestCase
      * @param  Message                     $message message instance
      * @return null|DataPart attachment instance.
      */
-    protected function getAttachment(Message $message)
+    protected function getAttachment(Message $message): ?DataPart
     {
         $messageParts = $message->getSymfonyEmail()->getAttachments();
         $attachment = null;
