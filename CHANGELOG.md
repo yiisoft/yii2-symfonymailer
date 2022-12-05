@@ -1,13 +1,13 @@
 Yii Framework 2 Symfony mailer extension Change Log
 ================================================
 
-3.0.0 under development
+3.0.0 December 05, 2022
 -----------------------
 
-- Enh #27: Extensive rewrite to make it more statically typed and better testable (sammousa)
 - Enh #22: Added an exception if there is no transport configuration (Krakozaber)
+- Enh #27: Extensive rewrite to make it more statically typed and better testable (sammousa)
 
- 
+
 2.0.4 September 04, 2022
 ------------------------
 

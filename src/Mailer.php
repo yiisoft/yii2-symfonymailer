@@ -28,27 +28,22 @@ class Mailer extends BaseMailer
      */
     public $messageClass = Message::class;
 
-    private ?SymfonyMailer $symfonyMailer = null;
 
+    private ?SymfonyMailer $symfonyMailer = null;
     /**
      * @see https://symfony.com/doc/current/mailer.html#encrypting-messages
      */
     public ?MessageEncrypterInterface $encrypter = null;
-
     /**
      * @see https://symfony.com/doc/current/mailer.html#signing-messages
      */
     public ?MessageSignerInterface $signer = null;
-
     public array $signerOptions = [];
-
     /**
      * @var null|TransportInterface Symfony transport instance or its array configuration.
      */
     private ?TransportInterface $_transport = null;
-
     public ?Transport $transportFactory = null;
-
     /**
      * Creates Symfony mailer instance.
      * @return SymfonyMailer mailer instance.

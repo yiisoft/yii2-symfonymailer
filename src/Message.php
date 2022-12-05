@@ -4,7 +4,6 @@
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license https://www.yiiframework.com/license/
  */
-declare(strict_types=1);
 
 namespace yii\symfonymailer;
 
@@ -21,13 +20,15 @@ use yii\mail\BaseMessage;
  * @psalm-suppress PropertyNotSetInConstructor
  * @psalm-type PsalmFileOptions array{fileName?: string, contentType?: string}
  * @psalm-type PsalmAddressList array<int|string, string>|string
+ *
+ * @property PsalmAddressList $bcc The type defined by the message interface is not strict enough.
+ * @property-read Email $symfonyEmail Symfony email instance.
+ *
  */
 class Message extends BaseMessage implements MessageWrapperInterface
 {
     private Email $email;
-
     private string $charset = 'utf-8';
-
     public function __construct(array $config = [])
     {
         $this->email = new Email();
