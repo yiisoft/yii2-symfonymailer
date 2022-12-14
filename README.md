@@ -28,7 +28,7 @@ php composer.phar require --prefer-dist yiisoft/yii2-symfonymailer
 or add
 
 ```json
-"yiisoft/yii2-symfonymailer": "~2.0.0"
+"yiisoft/yii2-symfonymailer": "~3.0.0"
 ```
 
 to the require section of your composer.json.
