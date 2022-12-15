@@ -19,7 +19,7 @@ use yii\mail\BaseMailer;
 
 /**
  * @psalm-suppress PropertyNotSetInConstructor
- * @psalm-type PsalmTransportConfig array{scheme?:string, host?:string, username?:string, password?:string, port?:int, options?: array, dsn?:string }
+ * @psalm-type PsalmTransportConfig array{scheme?:string, host?:string, username?:string, password?:string, port?:int, options?: array, dsn?:string|Dsn }
  */
 class Mailer extends BaseMailer
 {
@@ -105,8 +105,10 @@ class Mailer extends BaseMailer
     private function createTransport(array $config = []): TransportInterface
     {
         $transportFactory = $this->getTransportFactory();
-        if (array_key_exists('dsn', $config)) {
+        if (array_key_exists('dsn', $config) && is_string($config['dsn'])) {
             $transport = $transportFactory->fromString($config['dsn']);
+        } elseif (array_key_exists('dsn', $config) && $config['dsn'] instanceof Dsn) {
+            $transport = $transportFactory->fromDsnObject($config['dsn']);
         } elseif (array_key_exists('scheme', $config) && array_key_exists('host', $config)) {
             $dsn = new Dsn(
                 $config['scheme'],
