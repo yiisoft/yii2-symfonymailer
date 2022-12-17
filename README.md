@@ -28,7 +28,7 @@ php composer.phar require --prefer-dist yiisoft/yii2-symfonymailer
 or add
 
 ```json
-"yiisoft/yii2-symfonymailer": "~2.0.0"
+"yiisoft/yii2-symfonymailer": "~3.0.0"
 ```
 
 to the require section of your composer.json.
@@ -54,9 +54,9 @@ return [
             ],
             'viewPath' => '@common/mail',
             // send all mails to a file by default. You have to set
-			// 'useFileTransport' to false and configure transport
-			// for the mailer to send real emails.
-			'useFileTransport' => false,
+            // 'useFileTransport' to false and configure transport
+            // for the mailer to send real emails.
+            'useFileTransport' => false,
         ],
     ],
 ];
