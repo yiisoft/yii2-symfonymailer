@@ -4,7 +4,7 @@ Yii Framework 2 Symfony mailer extension Change Log
 3.0.1 under development
 -----------------------
 
-- no changes in this release.
+- Enh #45: Added option to create transport from Dsn object (Swanty)
 
 
 3.0.0 December 05, 2022

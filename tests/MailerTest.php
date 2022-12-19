@@ -144,6 +144,20 @@ final class MailerTest extends TestCase
         ]);
     }
 
+    public function testConfigureTransportFromDsnObject(): void
+    {
+        $mailer = new Mailer();
+
+        $factory = $this->getMockBuilder(Transport\TransportFactoryInterface::class)->getMock();
+        $factory->expects($this->atLeastOnce())->method('supports')->willReturn(true);
+        $factory->expects($this->once())->method('create');
+
+        $mailer->transportFactory = new Transport([$factory]);
+        $mailer->setTransport([
+            'dsn' => new \Symfony\Component\Mailer\Transport\Dsn('null', 'null'),
+        ]);
+    }
+
     public function testSetTransportWithInvalidArgumentThrowsException(): void
     {
         $mailer = new Mailer();
