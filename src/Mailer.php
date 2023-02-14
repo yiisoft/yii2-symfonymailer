@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace yii\symfonymailer;
 
-use Symfony\Component\Mailer\Mailer as SymfonyMailer;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\TransportInterface;
@@ -28,8 +27,6 @@ class Mailer extends BaseMailer
      */
     public $messageClass = Message::class;
 
-
-    private ?SymfonyMailer $symfonyMailer = null;
     /**
      * @see https://symfony.com/doc/current/mailer.html#encrypting-messages
      */
@@ -44,25 +41,6 @@ class Mailer extends BaseMailer
      */
     private ?TransportInterface $_transport = null;
     public ?Transport $transportFactory = null;
-    /**
-     * Creates Symfony mailer instance.
-     * @return SymfonyMailer mailer instance.
-     */
-    private function createSymfonyMailer(): SymfonyMailer
-    {
-        return new SymfonyMailer($this->getTransport());
-    }
-
-    /**
-     * @return SymfonyMailer Swift mailer instance
-     */
-    private function getSymfonyMailer(): SymfonyMailer
-    {
-        if (!isset($this->symfonyMailer)) {
-            $this->symfonyMailer = $this->createSymfonyMailer();
-        }
-        return $this->symfonyMailer;
-    }
 
     /**
      * @param PsalmTransportConfig|TransportInterface $transport
@@ -75,8 +53,6 @@ class Mailer extends BaseMailer
         }
 
         $this->_transport = $transport instanceof TransportInterface ? $transport : $this->createTransport($transport);
-
-        $this->symfonyMailer = null;
     }
 
     private function getTransport(): TransportInterface
@@ -143,7 +119,7 @@ class Mailer extends BaseMailer
         if ($this->signer !== null) {
             $message = $this->signer->sign($message, $this->signerOptions);
         }
-        $this->getSymfonyMailer()->send($message);
+        $this->getTransport()->send($message);
         return true;
     }
 }
