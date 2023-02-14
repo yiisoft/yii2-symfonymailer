@@ -34,14 +34,23 @@
         "symplify/easy-coding-standard": "^10.1",
         "vimeo/psalm": "^4.22",
         "captainhook/captainhook": "^5.10",
-        "captainhook/plugin-composer": "^5.3"
+        "captainhook/plugin-composer": "^5.3",
+        "yiisoft/yii2-psr-log-source": "dev-feat-dynamic-logger"
+    },
+    "suggest": {
+        "yiisoft/yii2-psr-log-source": "Allows routing transport logs to your Yii2 logger"
     },
     "repositories": [
         {
             "type": "composer",
             "url": "https://asset-packagist.org"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/SamMousa/yii2-psr-log-source"
         }
     ],
+
     "autoload": {
         "psr-4": {
             "yii\\symfonymailer\\": "src"

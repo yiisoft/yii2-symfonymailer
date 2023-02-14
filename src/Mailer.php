@@ -16,6 +16,8 @@ use Yii;
 use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
 use yii\mail\BaseMailer;
+use yii\psr\DynamicLogger;
+use yii\psr\Logger;
 
 /**
  * @psalm-suppress PropertyNotSetInConstructor
@@ -93,7 +95,8 @@ class Mailer extends BaseMailer
         if (isset($this->transportFactory)) {
             return $this->transportFactory;
         }
-        $defaultFactories = Transport::getDefaultFactories();
+        $logger = class_exists(DynamicLogger::class) ? new DynamicLogger() : null;
+        $defaultFactories = Transport::getDefaultFactories(null, null, $logger);
         /** @psalm-suppress InvalidArgument Symfony's type annotation is wrong */
         return new Transport($defaultFactories);
     }
