@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace yii\symfonymailer;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Mailer as SymfonyMailer;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Transport\Dsn;
@@ -95,6 +96,7 @@ class Mailer extends BaseMailer
         if (isset($this->transportFactory)) {
             return $this->transportFactory;
         }
+        /** @var LoggerInterface|null $logger */
         $logger = class_exists(DynamicLogger::class) ? new DynamicLogger() : null;
         $defaultFactories = Transport::getDefaultFactories(null, null, $logger);
         /** @psalm-suppress InvalidArgument Symfony's type annotation is wrong */
