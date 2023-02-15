@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace yiiunit\extensions\symfonymailer;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Transport\NullTransportFactory;
 use Symfony\Component\Mailer\Transport\TransportInterface;
@@ -179,17 +180,19 @@ final class MailerTest extends TestCase
     {
         \Yii::$container = new Container();
 
-        $mock = $this
+        $dispatcherMock = $this->getMockBuilder(EventDispatcherInterface::class)->getMock();
+        $dispatcherCreator = $this
             ->getMockBuilder(\stdclass::class)
             ->addMethods(['__invoke'])
             ->getMock();
 
-        $mock
-            ->expects(self::once())
-            ->method('__invoke')->willReturn(new NullTransportFactory());
-        \Yii::$container->set(NullTransportFactory::class, $mock);
-        $mailer = new Mailer();
+        $dispatcherCreator
+            ->expects(self::atLeastOnce())
+            ->method('__invoke')->willReturn($dispatcherMock);
+        \Yii::$container->set(EventDispatcherInterface::class, $dispatcherCreator);
 
+
+        $mailer = new Mailer();
         $mailer->setTransport([
             'dsn' => 'null://null',
         ]);

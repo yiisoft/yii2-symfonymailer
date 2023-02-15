@@ -126,7 +126,7 @@ class Mailer extends BaseMailer
                 if (!class_exists($factoryClass)) {
                     continue;
                 }
-                $factories[] = \Yii::$container->has($factoryClass) ? \Yii::$container->get($factoryClass) : new $factoryClass();
+                $factories[] = \Yii::$container->get($factoryClass);
             }
         } else {
             $factories = Transport::getDefaultFactories();
