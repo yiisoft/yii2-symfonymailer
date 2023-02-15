@@ -12,10 +12,21 @@ use Symfony\Component\Mailer\Mailer as SymfonyMailer;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\TransportInterface;
+use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesTransportFactory;
+use Symfony\Component\Mailer\Bridge\Google\Transport\GmailTransportFactory;
+use Symfony\Component\Mailer\Bridge\Infobip\Transport\InfobipTransportFactory;
+use Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillTransportFactory;
+use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory;
+use Symfony\Component\Mailer\Bridge\Mailjet\Transport\MailjetTransportFactory;
+use Symfony\Component\Mailer\Bridge\OhMySmtp\Transport\OhMySmtpTransportFactory;
+use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory;
+use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory;
+use Symfony\Component\Mailer\Bridge\Sendinblue\Transport\SendinblueTransportFactory;
 use Yii;
 use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
 use yii\mail\BaseMailer;
+use yii\mail\MessageInterface;
 
 /**
  * @psalm-suppress PropertyNotSetInConstructor
@@ -93,9 +104,36 @@ class Mailer extends BaseMailer
         if (isset($this->transportFactory)) {
             return $this->transportFactory;
         }
-        $defaultFactories = Transport::getDefaultFactories();
+        // Use the Yii DI container, if available.
+        if (isset(\Yii::$container)) {
+            $factories = [];
+            foreach([
+                Transport\NullTransportFactory::class,
+                Transport\SendmailTransportFactory::class,
+                Transport\Smtp\EsmtpTransportFactory::class,
+                Transport\NativeTransportFactory::class,
+                SesTransportFactory::class,
+                GmailTransportFactory::class,
+                InfobipTransportFactory::class,
+                MandrillTransportFactory::class,
+                MailgunTransportFactory::class,
+                MailjetTransportFactory::class,
+                OhMySmtpTransportFactory::class,
+                PostmarkTransportFactory::class,
+                SendgridTransportFactory::class,
+                SendinblueTransportFactory::class
+            ] as $factoryClass) {
+                if (!class_exists($factoryClass)) {
+                    continue;
+                }
+                $factories[] = \Yii::$container->has($factoryClass) ? \Yii::$container->get($factoryClass) : new $factoryClass();
+            }
+        } else {
+            $factories = Transport::getDefaultFactories();
+        }
+
         /** @psalm-suppress InvalidArgument Symfony's type annotation is wrong */
-        return new Transport($defaultFactories);
+        return new Transport($factories);
     }
 
     /**
@@ -125,6 +163,11 @@ class Mailer extends BaseMailer
         return $transport;
     }
 
+    /**
+     * @param MessageWrapperInterface&MessageInterface $message
+     * @return bool
+     * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface
+     */
     protected function sendMessage($message): bool
     {
         if (!($message instanceof MessageWrapperInterface)) {

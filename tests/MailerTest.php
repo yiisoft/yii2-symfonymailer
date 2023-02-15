@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace yiiunit\extensions\symfonymailer;
 
 use Symfony\Component\Mailer\Transport;
+use Symfony\Component\Mailer\Transport\NullTransportFactory;
 use Symfony\Component\Mailer\Transport\TransportInterface;
-use Symfony\Component\Mime\Crypto\SMimeEncrypter;
 use Yii;
 use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
+use yii\di\Container;
 use yii\mail\MessageInterface;
 use yii\symfonymailer\Mailer;
 use yii\symfonymailer\Message;
@@ -172,5 +173,27 @@ final class MailerTest extends TestCase
         $message = $this->getMockBuilder(MessageInterface::class)->getMock();
 
         $mailer->send($message);
+    }
+
+    public function testDiContainer(): void
+    {
+        \Yii::$container = new Container();
+
+        $mock = $this
+            ->getMockBuilder(\stdclass::class)
+            ->addMethods(['__invoke'])
+            ->getMock();
+
+        $mock
+            ->expects(self::once())
+            ->method('__invoke')->willReturn(new NullTransportFactory());
+        \Yii::$container->set(NullTransportFactory::class, $mock);
+        $mailer = new Mailer();
+
+        $mailer->setTransport([
+            'dsn' => 'null://null',
+        ]);
+
+
     }
 }
