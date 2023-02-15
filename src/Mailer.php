@@ -93,6 +93,7 @@ class Mailer extends BaseMailer
         if (isset($this->transportFactory)) {
             return $this->transportFactory;
         }
+        /** @psalm-suppress TooManyArguments function uses func_get_args */
         $defaultFactories = Transport::getDefaultFactories(new EventDispatcherProxy($this));
         /** @psalm-suppress InvalidArgument Symfony's type annotation is wrong */
         return new Transport($defaultFactories);
