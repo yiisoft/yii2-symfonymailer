@@ -6,7 +6,6 @@ namespace yiiunit\extensions\symfonymailer;
 
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Transport\TransportInterface;
-use Symfony\Component\Mime\Crypto\SMimeEncrypter;
 use Yii;
 use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;

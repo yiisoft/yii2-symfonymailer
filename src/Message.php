@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /**
  * @link https://www.yiiframework.com/
  * @copyright Copyright (c) 2008 Yii Software LLC
@@ -23,6 +25,8 @@ use yii\mail\BaseMessage;
  *
  * @property PsalmAddressList $bcc The type defined by the message interface is not strict enough.
  * @property-read Email $symfonyEmail Symfony email instance.
+ *
+ * @not-fix This class may be extended by library users
  */
 class Message extends BaseMessage implements MessageWrapperInterface
 {

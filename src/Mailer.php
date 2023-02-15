@@ -12,7 +12,6 @@ use Symfony\Component\Mailer\Mailer as SymfonyMailer;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\TransportInterface;
-use Yii;
 use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
 use yii\mail\BaseMailer;
@@ -21,6 +20,7 @@ use yii\mail\BaseMailer;
  * @psalm-suppress PropertyNotSetInConstructor
  * @psalm-type TransportConfigArray array{scheme?:string, host?:string, username?:string, password?:string, port?:int, options?: array<mixed>, dsn?:string|Dsn }
  * @phpstan-type TransportConfigArray array{scheme?:string, host?:string, username?:string, password?:string, port?:int, options?: array<mixed>, dsn?:string|Dsn }
+ * @not-fix
  */
 class Mailer extends BaseMailer
 {

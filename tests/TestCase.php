@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace yiiunit\extensions\symfonymailer;
 
 use yii\helpers\ArrayHelper;
