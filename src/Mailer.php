@@ -19,7 +19,8 @@ use yii\mail\BaseMailer;
 
 /**
  * @psalm-suppress PropertyNotSetInConstructor
- * @psalm-type PsalmTransportConfig array{scheme?:string, host?:string, username?:string, password?:string, port?:int, options?: array, dsn?:string|Dsn }
+ * @psalm-type TransportConfigArray array{scheme?:string, host?:string, username?:string, password?:string, port?:int, options?: array<mixed>, dsn?:string|Dsn }
+ * @phpstan-type TransportConfigArray array{scheme?:string, host?:string, username?:string, password?:string, port?:int, options?: array<mixed>, dsn?:string|Dsn }
  */
 class Mailer extends BaseMailer
 {
@@ -38,6 +39,9 @@ class Mailer extends BaseMailer
      * @see https://symfony.com/doc/current/mailer.html#signing-messages
      */
     public ?MessageSignerInterface $signer = null;
+    /**
+     * @var array<mixed>
+     */
     public array $signerOptions = [];
     /**
      * @var null|TransportInterface Symfony transport instance or its array configuration.
@@ -65,15 +69,11 @@ class Mailer extends BaseMailer
     }
 
     /**
-     * @param PsalmTransportConfig|TransportInterface $transport
+     * @param TransportConfigArray|TransportInterface $transport
      * @throws InvalidConfigException on invalid argument.
      */
-    public function setTransport($transport): void
+    public function setTransport(array|TransportInterface $transport): void
     {
-        if (!is_array($transport) && !$transport instanceof TransportInterface) {
-            throw new InvalidArgumentException('"' . get_class($this) . '::transport" should be either object or array, "' . gettype($transport) . '" given.');
-        }
-
         $this->_transport = $transport instanceof TransportInterface ? $transport : $this->createTransport($transport);
 
         $this->symfonyMailer = null;
@@ -99,7 +99,7 @@ class Mailer extends BaseMailer
     }
 
     /**
-     * @param PsalmTransportConfig $config
+     * @param TransportConfigArray $config
      * @throws InvalidConfigException
      */
     private function createTransport(array $config = []): TransportInterface

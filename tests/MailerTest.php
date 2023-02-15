@@ -158,13 +158,6 @@ final class MailerTest extends TestCase
         ]);
     }
 
-    public function testSetTransportWithInvalidArgumentThrowsException(): void
-    {
-        $mailer = new Mailer();
-        $this->expectException(InvalidArgumentException::class);
-        $mailer->setTransport(new \stdClass());
-    }
-
     public function testSendMessageThrowsOnBadMessageType(): void
     {
         $mailer = new Mailer();

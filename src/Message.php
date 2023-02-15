@@ -28,6 +28,10 @@ class Message extends BaseMessage implements MessageWrapperInterface
 {
     private Email $email;
     private string $charset = 'utf-8';
+
+    /**
+     * @param array<string, mixed> $config
+     */
     public function __construct(array $config = [])
     {
         $this->email = new Email();
@@ -55,23 +59,32 @@ class Message extends BaseMessage implements MessageWrapperInterface
         return $this;
     }
 
-    public function getFrom()
+    /**
+     * @psalm-suppress ArgumentTypeCoercion Symfony typehint is too loose
+     * @return array<string, string>|string
+     */
+    public function getFrom(): array|string
     {
         return $this->convertAddressesToStrings($this->email->getFrom());
     }
 
     /**
      * @param array<int|string, string>|string $from
-     * @psalm-suppress MoreSpecificImplementedParamType
-     * @psalm-suppress LessSpecificImplementedReturnType
+     * @psalm-suppress MoreSpecificImplementedParamType Yii typehint is too loose
+     * @psalm-suppress ArgumentTypeCoercion Symfony typehint is too loose
+     * @return $this
      */
-    public function setFrom($from): self
+    public function setFrom($from): static
     {
         $this->email->from(...$this->convertStringsToAddresses($from));
         return $this;
     }
 
-    public function getTo()
+    /**
+     * @psalm-suppress ArgumentTypeCoercion Symfony typehint is too loose
+     * @return array<string, string>|string
+     */
+    public function getTo(): array|string
     {
         return $this->convertAddressesToStrings($this->email->getTo());
     }
@@ -87,6 +100,10 @@ class Message extends BaseMessage implements MessageWrapperInterface
         return $this;
     }
 
+    /**
+     * @psalm-suppress ArgumentTypeCoercion Symfony typehint is too loose
+     * @return array<string, string>|string
+     */
     public function getReplyTo()
     {
         return $this->convertAddressesToStrings($this->email->getReplyTo());
@@ -103,7 +120,11 @@ class Message extends BaseMessage implements MessageWrapperInterface
         return $this;
     }
 
-    public function getCc()
+    /**
+     * @psalm-suppress ArgumentTypeCoercion Symfony typehint is too loose
+     * @return array<string,string>|string
+     */
+    public function getCc(): array|string
     {
         return $this->convertAddressesToStrings($this->email->getCc());
     }
@@ -119,7 +140,11 @@ class Message extends BaseMessage implements MessageWrapperInterface
         return $this;
     }
 
-    public function getBcc()
+    /**
+     * @psalm-suppress ArgumentTypeCoercion Symfony typehint is too loose
+     * @return array<string, string>|string
+     */
+    public function getBcc(): array|string
     {
         return $this->convertAddressesToStrings($this->email->getBcc());
     }
@@ -262,6 +287,9 @@ class Message extends BaseMessage implements MessageWrapperInterface
         return 'cid:' . $options['fileName'];
     }
 
+    /**
+     * @return list<string>
+     */
     public function getHeader(string $name): array
     {
         $headers = $this->email->getHeaders();
@@ -285,7 +313,7 @@ class Message extends BaseMessage implements MessageWrapperInterface
     /**
      * @param string|list<string> $value
      */
-    public function setHeader(string $name, $value): self
+    public function setHeader(string $name, array|string $value): self
     {
         $headers = $this->email->getHeaders();
 
@@ -329,11 +357,11 @@ class Message extends BaseMessage implements MessageWrapperInterface
     /**
      * Converts address instances to their string representations.
      *
-     * @param Address[] $addresses
+     * @param list<Address> $addresses
      *
      * @return array<string, string>|string
      */
-    private function convertAddressesToStrings(array $addresses)
+    private function convertAddressesToStrings(array $addresses): string|array
     {
         $strings = [];
 
@@ -349,9 +377,9 @@ class Message extends BaseMessage implements MessageWrapperInterface
      *
      * @param array<int|string, string>|string $strings
      *
-     * @return Address[]
+     * @return list<Address>
      */
-    private function convertStringsToAddresses($strings): array
+    private function convertStringsToAddresses(array|string $strings): array
     {
         $addresses = [];
 

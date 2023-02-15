@@ -34,7 +34,8 @@
         "symplify/easy-coding-standard": "^10",
         "vimeo/psalm": "^5",
         "captainhook/captainhook": "^5.10",
-        "captainhook/plugin-composer": "^5.3"
+        "captainhook/plugin-composer": "^5.3",
+        "phpstan/phpstan": "^1.9"
     },
     "repositories": [
         {

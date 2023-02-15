@@ -12,5 +12,8 @@ use Symfony\Component\Mime\Message;
 
 interface MessageSignerInterface
 {
+    /**
+     * @param array<mixed> $options
+     */
     public function sign(Message $message, array $options = []): Message;
 }
