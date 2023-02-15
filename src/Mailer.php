@@ -20,7 +20,7 @@ use yii\mail\BaseMailer;
  * @psalm-suppress PropertyNotSetInConstructor
  * @psalm-type TransportConfigArray array{scheme?:string, host?:string, username?:string, password?:string, port?:int, options?: array<mixed>, dsn?:string|Dsn }
  * @phpstan-type TransportConfigArray array{scheme?:string, host?:string, username?:string, password?:string, port?:int, options?: array<mixed>, dsn?:string|Dsn }
- * @not-fix
+ * @extendable
  */
 class Mailer extends BaseMailer
 {

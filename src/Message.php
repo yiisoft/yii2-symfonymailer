@@ -26,7 +26,7 @@ use yii\mail\BaseMessage;
  * @property PsalmAddressList $bcc The type defined by the message interface is not strict enough.
  * @property-read Email $symfonyEmail Symfony email instance.
  *
- * @not-fix This class may be extended by library users
+ * @extendable
  */
 class Message extends BaseMessage implements MessageWrapperInterface
 {

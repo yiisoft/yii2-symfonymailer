@@ -27,7 +27,7 @@ return static function (ECSConfig $ecsConfig): void {
     $ecsConfig->rule(NoUnusedImportsFixer::class);
     $ecsConfig->rule(DeclareStrictTypesFixer::class);
     $ecsConfig->ruleWithConfiguration(FinalInternalClassFixer::class, [
-        'annotation_exclude' => ['@not-fix'],
+        'annotation_exclude' => ['@extendable'],
         'annotation_include' => [],
         'consider_absent_docblock_as_internal_class' => \true
     ]);
