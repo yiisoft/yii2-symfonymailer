@@ -11,6 +11,10 @@ namespace yii\symfonymailer;
 use Symfony\Component\Mailer\Mailer as SymfonyMailer;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Transport\Dsn;
+use Symfony\Component\Mailer\Transport\NativeTransportFactory;
+use Symfony\Component\Mailer\Transport\NullTransportFactory;
+use Symfony\Component\Mailer\Transport\SendmailTransportFactory;
+use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransportFactory;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesTransportFactory;
 use Symfony\Component\Mailer\Bridge\Google\Transport\GmailTransportFactory;
@@ -99,6 +103,12 @@ class Mailer extends BaseMailer
         return $this->_transport;
     }
 
+    /**
+     * @psalm-suppress UndefinedClass
+     * @return Transport
+     * @throws InvalidConfigException
+     * @throws \yii\di\NotInstantiableException
+     */
     private function getTransportFactory(): Transport
     {
         if (isset($this->transportFactory)) {
@@ -108,10 +118,10 @@ class Mailer extends BaseMailer
         if (isset(\Yii::$container)) {
             $factories = [];
             foreach([
-                Transport\NullTransportFactory::class,
-                Transport\SendmailTransportFactory::class,
-                Transport\Smtp\EsmtpTransportFactory::class,
-                Transport\NativeTransportFactory::class,
+                NullTransportFactory::class,
+                SendmailTransportFactory::class,
+                EsmtpTransportFactory::class,
+                NativeTransportFactory::class,
                 SesTransportFactory::class,
                 GmailTransportFactory::class,
                 InfobipTransportFactory::class,
