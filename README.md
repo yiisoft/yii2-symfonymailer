@@ -108,3 +108,8 @@ Security implications of the DSN
 While the DSN might seem like a simple way to allow user configurable mailer settings it should be noted that the sendmail transport allows for execution of local executables.
 If you need to have a user configurable DSN (which is easier to build and more powerful to use than creating a GUI) you should probably disable the sendmail transport.
 Any user who has the power to configure a DSN essentially has shell access to wherever the code is running.
+
+DI Container
+------------
+The `Mailer` component will automatically use the DI container when it is available.
+This allows you to easily override the transport factory configurations or their dependencies.
