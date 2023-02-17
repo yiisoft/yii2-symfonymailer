@@ -32,10 +32,13 @@ jobs:
               uses: actions/cache@v1
               with:
                   path: ${{ steps.composer-cache.outputs.dir }}
-                  key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-                  restore-keys: ${{ runner.os }}-composer-
+                  key: ${{ runner.os }}-composer-${{ matrix.php }}-${{ hashFiles('**/composer.lock') }}
+                  restore-keys: ${{ runner.os }}-composer-${{ matrix.php }}-
             - name: Install dependencies
               run: composer update $DEFAULT_COMPOSER_FLAGS
+            - name: Install logging proxy
+              if: ${{ matrix.php != '7.4' }}
+              run: composer require "yiisoft/yii2-psr-log-source"
             - name: Run unit tests with coverage
               run: vendor/bin/phpunit --coverage-text
             - name: Static analysis (Psalm)

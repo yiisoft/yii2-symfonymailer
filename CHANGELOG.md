@@ -1,16 +1,17 @@
 Yii Framework 2 Symfony mailer extension Change Log
 ================================================
 
-4.0.0 
+4.0.0
 ------
- 
-- Include logger proxy as a dependency
-- Drop support for end-of-life php versions 7.4 and 8.0
 
-3.0.1 under development
+- Enh #45: Include logger proxy as a dependency
+- Enh #45: Drop support for end-of-life php versions 7.4 and 8.0
+
+3.1.0 under development
 -----------------------
 
 - Enh #45: Added option to create transport from Dsn object (Swanty)
+- Enh #50: Forward transport logs to the Yii Logger (sammousa) 
 
 
 3.0.0 December 05, 2022

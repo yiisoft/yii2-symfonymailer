@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace yii\symfonymailer;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Mailer as SymfonyMailer;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Transport\Dsn;
@@ -15,6 +16,8 @@ use Symfony\Component\Mailer\Transport\TransportInterface;
 use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
 use yii\mail\BaseMailer;
+use yii\psr\DynamicLogger;
+use yii\psr\Logger;
 
 /**
  * @psalm-suppress PropertyNotSetInConstructor
@@ -93,7 +96,12 @@ class Mailer extends BaseMailer
         if (isset($this->transportFactory)) {
             return $this->transportFactory;
         }
-        $defaultFactories = Transport::getDefaultFactories();
+        /** @var LoggerInterface|null $logger */
+        $logger = class_exists(DynamicLogger::class) ? new DynamicLogger() : null;
+        /**
+         * @psalm-suppress TooManyArguments On PHP 7.4 symfony/mailer 5.4 is uses which uses func_get_args instead of real args
+         */
+        $defaultFactories = Transport::getDefaultFactories(null, null, $logger);
         /** @psalm-suppress InvalidArgument Symfony's type annotation is wrong */
         return new Transport($defaultFactories);
     }
