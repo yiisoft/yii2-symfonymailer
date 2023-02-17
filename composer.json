@@ -36,6 +36,9 @@
         "captainhook/captainhook": "^5.10",
         "captainhook/plugin-composer": "^5.3"
     },
+    "suggest": {
+        "yiisoft/yii2-psr-log-source": "Allows routing transport logs to your Yii2 logger"
+    },
     "repositories": [
         {
             "type": "composer",
