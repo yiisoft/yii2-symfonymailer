@@ -17,7 +17,6 @@ use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
 use yii\mail\BaseMailer;
 use yii\psr\DynamicLogger;
-use yii\psr\Logger;
 
 /**
  * @psalm-suppress PropertyNotSetInConstructor
