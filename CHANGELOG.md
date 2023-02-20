@@ -6,6 +6,7 @@ Yii Framework 2 Symfony mailer extension Change Log
 
 - Enh #45: Added option to create transport from Dsn object (Swanty)
 - Enh #50: Forward transport logs to the Yii Logger (sammousa) 
+- Enh #49: Removed dependency on SymfonyMailer class (sammousa)
 
 
 3.0.0 December 05, 2022
