@@ -76,7 +76,7 @@ class Mailer extends BaseMailer
         /**
          * @psalm-suppress TooManyArguments On PHP 7.4 symfony/mailer 5.4 is uses which uses func_get_args instead of real args
          */
-        $defaultFactories = Transport::getDefaultFactories(null, null, $logger);
+        $defaultFactories = Transport::getDefaultFactories(new EventDispatcherProxy($this), null, $logger);
         /** @psalm-suppress InvalidArgument Symfony's type annotation is wrong */
         return new Transport($defaultFactories);
     }
