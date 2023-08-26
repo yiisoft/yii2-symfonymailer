@@ -101,7 +101,7 @@ Swiftmailer default transport was the `SendmailTransport`, while with this exten
        ],
    ],
    ```
-With this extension, you do not have ability of directly setting timeout for example which with former extension could be set on configuration. The reason is, the underlying symfony extension defines its classes as final thereby discouraging inheritance and pushing towards composition. To achieve timeout (and other transport configurations), you will need to define factory class. below is a sample example for SMTP transport.
+With this extension, you do not have an ability of directly setting timeout that was possible with Swiftmailer extension. The reason is, the underlying Symfony package defines its classes as `final` thereby discouraging inheritance and pushing towards composition. To achieve timeout (and other transport configurations), you will need to define factory class. Below is an example for SMTP transport.
 
 ```php
 namespace app\utils; //file is in utils folder of your application
