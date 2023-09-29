@@ -13,6 +13,12 @@ For license information check the [LICENSE](LICENSE.md)-file.
 [![Latest Stable Version](https://poser.pugx.org/yiisoft/yii2-symfonymailer/v/stable.png)](https://packagist.org/packages/yiisoft/yii2-symfonymailer)
 [![Total Downloads](https://poser.pugx.org/yiisoft/yii2-symfonymailer/downloads.png)](https://packagist.org/packages/yiisoft/yii2-symfonymailer)
 [![Build Status](https://github.com/yiisoft/yii2-symfonymailer/workflows/build/badge.svg)](https://github.com/yiisoft/yii2-symfonymailer/actions)
+[![codecov](https://codecov.io/gh/yiisoft/yii2-symfonymailer/graph/badge.svg?token=XCj60xP699)](https://codecov.io/gh/yiisoft/yii2-symfonymailer)
+
+Requirements
+------------
+
+- PHP 7.4 or higher.
 
 Installation
 ------------
