@@ -106,7 +106,7 @@ With this extension, you do not have an ability of directly setting timeout that
 ```php
 namespace app\utils; //file is in utils folder of your application
 
-use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
+use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
 
 class CustomSmtpFactory implements TransportFactoryInterface {
     public function __construct(private TransportFactoryInterface $factory, private float $timeout)
