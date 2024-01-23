@@ -19,7 +19,7 @@ use yii\psr\DynamicLogger;
 
 /**
  * @psalm-suppress PropertyNotSetInConstructor
- * @psalm-type TransportConfigArray array{scheme?:string, host?:string, username?:string, password?:string, port?:int, options?: array<mixed>, dsn?:string|Dsn }
+ * @psalm-type TransportHostArray array{scheme?:string, host?:string, username?:string, password?:string, port?:int, options?: array<mixed>, dsn?:string|Dsn }
  * @phpstan-type TransportConfigArray array{scheme?:string, host?:string, username?:string, password?:string, port?:int, options?: array<mixed>, dsn?:string|Dsn }
  * @extendable
  */
@@ -88,10 +88,12 @@ class Mailer extends BaseMailer
     private function createTransport(array $config = []): TransportInterface
     {
         $transportFactory = $this->getTransportFactory();
-        if (array_key_exists('dsn', $config) && is_string($config['dsn'])) {
-            $transport = $transportFactory->fromString($config['dsn']);
-        } elseif (array_key_exists('dsn', $config) && $config['dsn'] instanceof Dsn) {
-            $transport = $transportFactory->fromDsnObject($config['dsn']);
+        if (array_key_exists('dsn', $config)) {
+            if (is_string($config['dsn'])) {
+                $transport = $transportFactory->fromString($config['dsn']);
+            } else {
+                $transport = $transportFactory->fromDsnObject($config['dsn']);
+            }
         } elseif (array_key_exists('scheme', $config) && array_key_exists('host', $config)) {
             $dsn = new Dsn(
                 $config['scheme'],

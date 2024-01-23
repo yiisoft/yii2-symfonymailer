@@ -284,7 +284,7 @@ class Message extends BaseMessage implements MessageWrapperInterface
      */
     public function embedContent($content, array $options = []): string
     {
-        if (empty($options['fileName'])) {
+        if (!isset($options['fileName'])) {
             throw new InvalidConfigException('A valid file name must be passed when embedding content');
         }
         $this->email->embed($content, $options['fileName'], $options['contentType'] ?? null);
