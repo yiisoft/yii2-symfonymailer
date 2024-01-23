@@ -91,7 +91,7 @@ Migrating from yiisoft/yii2-swiftmailer
 
 To migrate from the deprecated [yiisoft/yii2-swiftmailer](https://github.com/yiisoft/yii2-swiftmailer) to this extension you need to update the application config.
 
-Swiftmailer default transport was the `SendmailTransport`, while this extension will default to a `NullTransport` (sends no mail). You can use the swiftmailer default like the following:
+Swiftmailer default transport was the `SendmailTransport`, while with this extension it will default to a `NullTransport` (sends no mail). You can use the swiftmailer default like the following:
 
    ```php
    'mailer' => [
@@ -101,6 +101,48 @@ Swiftmailer default transport was the `SendmailTransport`, while this extension 
        ],
    ],
    ```
+With this extension, you do not have an ability of directly setting timeout that was possible with Swiftmailer extension. The reason is, the underlying Symfony package defines its classes as `final` thereby discouraging inheritance and pushing towards composition. To achieve timeout (and other transport configurations), you will need to define factory class. Below is an example for SMTP transport.
+
+```php
+namespace app\utils; //file is in utils folder of your application
+
+use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
+use Symfony\Component\Mailer\Transport\Smtp\SmtpTransport;
+
+class CustomSmtpFactory implements TransportFactoryInterface {
+    public function __construct(private TransportFactoryInterface $factory, private float $timeout)
+    {
+        $this->timeout = 120;
+    }
+
+    public function create(Dsn $dsn): TransportInterface
+    {
+        $result = $this->factory->create($dsn);
+        if ($result instanceof SmtpTransport) {
+            //Setup timeout to this or 
+            $result->getStream()->setTimeout($this->timeout);
+        }
+        return $result;
+    }
+
+    public function supports(Dsn $dsn): bool {
+        return $this->factory->supports($dsn);
+    }
+}
+```
+
+then in configuration, set the factory
+
+```php
+   'mailer' => [
+       'class' => yii\symfonymailer\Mailer::class,
+       'transportFactory' => app\utils\CustomSmtpFactory::class,
+        'transport' => [
+            'scheme' => 'smtp',
+            //other settings
+        ],
+   ],
+  ```
 
 Security implications of the DSN
 --------------------------------

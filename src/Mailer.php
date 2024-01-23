@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace yii\symfonymailer;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Mailer\Mailer as SymfonyMailer;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\TransportInterface;
@@ -17,7 +16,6 @@ use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
 use yii\mail\BaseMailer;
 use yii\psr\DynamicLogger;
-use yii\psr\Logger;
 
 /**
  * @psalm-suppress PropertyNotSetInConstructor
@@ -32,8 +30,6 @@ class Mailer extends BaseMailer
      */
     public $messageClass = Message::class;
 
-
-    private ?SymfonyMailer $symfonyMailer = null;
     /**
      * @see https://symfony.com/doc/current/mailer.html#encrypting-messages
      */
@@ -51,25 +47,6 @@ class Mailer extends BaseMailer
      */
     private ?TransportInterface $_transport = null;
     public ?Transport $transportFactory = null;
-    /**
-     * Creates Symfony mailer instance.
-     * @return SymfonyMailer mailer instance.
-     */
-    private function createSymfonyMailer(): SymfonyMailer
-    {
-        return new SymfonyMailer($this->getTransport());
-    }
-
-    /**
-     * @return SymfonyMailer Swift mailer instance
-     */
-    private function getSymfonyMailer(): SymfonyMailer
-    {
-        if (!isset($this->symfonyMailer)) {
-            $this->symfonyMailer = $this->createSymfonyMailer();
-        }
-        return $this->symfonyMailer;
-    }
 
     /**
      * @param TransportConfigArray|TransportInterface $transport
@@ -78,8 +55,6 @@ class Mailer extends BaseMailer
     public function setTransport(array|TransportInterface $transport): void
     {
         $this->_transport = $transport instanceof TransportInterface ? $transport : $this->createTransport($transport);
-
-        $this->symfonyMailer = null;
     }
 
     private function getTransport(): TransportInterface
@@ -101,7 +76,7 @@ class Mailer extends BaseMailer
         /**
          * @psalm-suppress TooManyArguments On PHP 7.4 symfony/mailer 5.4 is uses which uses func_get_args instead of real args
          */
-        $defaultFactories = Transport::getDefaultFactories(null, null, $logger);
+        $defaultFactories = Transport::getDefaultFactories(new EventDispatcherProxy($this), null, $logger);
         /** @psalm-suppress InvalidArgument Symfony's type annotation is wrong */
         return new Transport($defaultFactories);
     }
@@ -151,7 +126,7 @@ class Mailer extends BaseMailer
         if ($this->signer !== null) {
             $message = $this->signer->sign($message, $this->signerOptions);
         }
-        $this->getSymfonyMailer()->send($message);
+        $this->getTransport()->send($message);
         return true;
     }
 }
