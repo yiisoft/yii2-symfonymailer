@@ -16,9 +16,7 @@ use Symfony\Component\Mime\Message;
  */
 final class SMimeMessageEncrypter implements MessageEncrypterInterface
 {
-    public function __construct(private readonly SMimeEncrypter $encrypter)
-    {
-    }
+    public function __construct(private readonly SMimeEncrypter $encrypter) {}
 
     public function encrypt(Message $message): Message
     {

@@ -26,16 +26,17 @@
     ],
     "require": {
         "php": ">=8.1",
-        "yiisoft/yii2": ">=2.0.4",
-        "symfony/mailer": ">=6"
+        "psr/event-dispatcher": "1.0.0",
+        "symfony/mailer": "^6.4 || ^7.0",
+        "symfony/mime": "^6.4 || ^7.0",
+        "yiisoft/yii2": ">=2.0.4"
     },
     "require-dev": {
-        "phpunit/phpunit": "^10",
-        "symplify/easy-coding-standard": "^10",
-        "vimeo/psalm": "^5",
-        "captainhook/captainhook": "^5.10",
-        "captainhook/plugin-composer": "^5.3",
-        "phpstan/phpstan": "^1.9"
+        "maglnet/composer-require-checker": "^4.7",
+        "phpunit/phpunit": "^10.5",
+        "roave/infection-static-analysis-plugin": "^1.34",
+        "symplify/easy-coding-standard": "^12.1",
+        "vimeo/psalm": "^5.20"
     },
     "suggest": {
         "yiisoft/yii2-psr-log-source": "Allows routing transport logs to your Yii2 logger"
@@ -59,12 +60,23 @@
     "extra": {
         "branch-alias": {
             "dev-master": "3.0.x-dev"
-        }
+        },
+        "sort-packages": true
     },
     "config": {
         "allow-plugins": {
             "yiisoft/yii2-composer": true,
-            "captainhook/plugin-composer": true
+            "infection/extension-installer": true
         }
+    },
+    "scripts": {
+        "check-dependencies": "composer-require-checker",
+        "easy-coding-standard": "ecs check",
+        "mutation": [
+            "Composer\\Config::disableProcessTimeout",
+            "roave-infection-static-analysis-plugin"
+        ],
+        "psalm": "psalm",
+        "test": "phpunit"
     }
 }
