@@ -1,6 +1,12 @@
 Yii Framework 2 Symfony mailer extension Change Log
 ================================================
 
+4.0.0
+------
+
+- Enh #45: Include logger proxy as a dependency
+- Enh #45: Drop support for end-of-life php versions 7.4 and 8.0
+
 3.1.0 under development
 -----------------------
 

@@ -25,16 +25,17 @@
         }
     ],
     "require": {
-        "php": ">=7.4.0",
+        "php": ">=8.1",
         "yiisoft/yii2": ">=2.0.4",
-        "symfony/mailer": ">=5.4.0"
+        "symfony/mailer": ">=6"
     },
     "require-dev": {
-        "phpunit/phpunit": "9.5.10",
-        "symplify/easy-coding-standard": "^10.1",
-        "vimeo/psalm": "^4.22",
+        "phpunit/phpunit": "^10",
+        "symplify/easy-coding-standard": "^10",
+        "vimeo/psalm": "^5",
         "captainhook/captainhook": "^5.10",
-        "captainhook/plugin-composer": "^5.3"
+        "captainhook/plugin-composer": "^5.3",
+        "phpstan/phpstan": "^1.9"
     },
     "suggest": {
         "yiisoft/yii2-psr-log-source": "Allows routing transport logs to your Yii2 logger"
