@@ -25,6 +25,7 @@ jobs:
   easy-coding-standard:
     uses: yiisoft/actions/.github/workflows/ecs.yml@add-ecs-workflow-
     with:
+      fix: true
       os: >-
         ['ubuntu-latest']
       php: >-
