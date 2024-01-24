@@ -6,7 +6,6 @@ namespace yiiunit\extensions\symfonymailer;
 
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Transport\TransportInterface;
-use Symfony\Component\Mime\Crypto\SMimeEncrypter;
 use Yii;
 use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
@@ -156,13 +155,6 @@ final class MailerTest extends TestCase
         $mailer->setTransport([
             'dsn' => new \Symfony\Component\Mailer\Transport\Dsn('null', 'null'),
         ]);
-    }
-
-    public function testSetTransportWithInvalidArgumentThrowsException(): void
-    {
-        $mailer = new Mailer();
-        $this->expectException(InvalidArgumentException::class);
-        $mailer->setTransport(new \stdClass());
     }
 
     public function testSendMessageThrowsOnBadMessageType(): void

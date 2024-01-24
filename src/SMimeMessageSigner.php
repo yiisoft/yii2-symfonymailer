@@ -14,13 +14,9 @@ use Symfony\Component\Mime\Message;
 /**
  * @codeCoverageIgnore This class is a trivial proxy that requires no testing
  */
-class SMimeMessageSigner implements MessageSignerInterface
+final class SMimeMessageSigner implements MessageSignerInterface
 {
-    private SMimeSigner $signer;
-    public function __construct(SMimeSigner $signer)
-    {
-        $this->signer = $signer;
-    }
+    public function __construct(private readonly SMimeSigner $signer) {}
 
     public function sign(Message $message, array $options = []): Message
     {

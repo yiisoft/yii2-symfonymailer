@@ -14,7 +14,7 @@ use Symfony\Component\Mime\Message;
 /**
  * @codeCoverageIgnore This class is a trivial proxy that requires no testing
  */
-class DkimMessageSigner implements MessageSignerInterface
+final class DkimMessageSigner implements MessageSignerInterface
 {
     private DkimSigner $dkimSigner;
     public function __construct(DkimSigner $dkimSigner)

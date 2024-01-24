@@ -46,55 +46,6 @@ final class MessageTest extends TestCase
         }
     }
 
-    /**
-     * @return string test file path.
-     */
-    private function getTestFilePath(): string
-    {
-        return Yii::getAlias('@yiiunit/extensions/symfonymailer/runtime') . DIRECTORY_SEPARATOR . basename(get_class($this)) . '_' . getmypid();
-    }
-
-    /**
-     * @return Mailer test email component instance.
-     */
-    private function createTestEmailComponent(): Mailer
-    {
-        $component = new Mailer([
-            'useFileTransport' => true,
-        ]);
-
-        return $component;
-    }
-
-    /**
-     * @return Message test message instance.
-     */
-    private function createTestMessage(): Message
-    {
-        return Yii::$app->get('mailer')->compose();
-    }
-
-    /**
-     * Creates image file with given text.
-     * @param  string $fileName file name.
-     * @param  string $text     text to be applied on image.
-     * @return string image file full name.
-     */
-    private function createImageFile($fileName = 'test.jpg', $text = 'Test Image'): string
-    {
-        if (!function_exists('imagecreatetruecolor')) {
-            $this->markTestSkipped('GD lib required.');
-        }
-        $fileFullName = $this->getTestFilePath() . DIRECTORY_SEPARATOR . $fileName;
-        $image = imagecreatetruecolor(120, 20);
-        $textColor = imagecolorallocate($image, 233, 14, 91);
-        imagestring($image, 1, 5, 5, $text, $textColor);
-        imagejpeg($image, $fileFullName);
-        imagedestroy($image);
-
-        return $fileFullName;
-    }
-
 
     // Tests :
 
@@ -436,5 +387,54 @@ final class MessageTest extends TestCase
         }
 
         return $attachment;
+    }
+
+    /**
+     * @return string test file path.
+     */
+    private function getTestFilePath(): string
+    {
+        return Yii::getAlias('@yiiunit/extensions/symfonymailer/runtime') . DIRECTORY_SEPARATOR . basename(get_class($this)) . '_' . getmypid();
+    }
+
+    /**
+     * @return Mailer test email component instance.
+     */
+    private function createTestEmailComponent(): Mailer
+    {
+        $component = new Mailer([
+            'useFileTransport' => true,
+        ]);
+
+        return $component;
+    }
+
+    /**
+     * @return Message test message instance.
+     */
+    private function createTestMessage(): Message
+    {
+        return Yii::$app->get('mailer')->compose();
+    }
+
+    /**
+     * Creates image file with given text.
+     * @param  string $fileName file name.
+     * @param  string $text     text to be applied on image.
+     * @return string image file full name.
+     */
+    private function createImageFile($fileName = 'test.jpg', $text = 'Test Image'): string
+    {
+        if (!function_exists('imagecreatetruecolor')) {
+            $this->markTestSkipped('GD lib required.');
+        }
+        $fileFullName = $this->getTestFilePath() . DIRECTORY_SEPARATOR . $fileName;
+        $image = imagecreatetruecolor(120, 20);
+        $textColor = imagecolorallocate($image, 233, 14, 91);
+        imagestring($image, 1, 5, 5, $text, $textColor);
+        imagejpeg($image, $fileFullName);
+        imagedestroy($image);
+
+        return $fileFullName;
     }
 }
