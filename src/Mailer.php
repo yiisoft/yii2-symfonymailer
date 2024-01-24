@@ -44,7 +44,7 @@ class Mailer extends BaseMailer
     public array $signerOptions = [];
     public ?Transport $transportFactory = null;
     /**
-     * @var null|TransportInterface Symfony transport instance or its array configuration.
+     * @var TransportInterface|null Symfony transport instance or its array configuration.
      */
     private ?TransportInterface $_transport = null;
 
