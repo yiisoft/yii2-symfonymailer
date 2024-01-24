@@ -106,7 +106,7 @@ final class MessageTest extends TestCase
 
         $messageWithoutSymfonyInitialized = new Message();
         $m2 = clone $messageWithoutSymfonyInitialized; // should be no error during cloning
-        $this->assertTrue($m2 instanceof Message);
+        $this->assertInstanceOf(Message::class, $m2);
     }
 
     public function testSetupHeaderShortcuts(): void
@@ -140,7 +140,7 @@ final class MessageTest extends TestCase
         $this->assertStringContainsString("To: $to", $messageString, 'Incorrect "To" header!');
         $this->assertStringContainsString("Cc: $cc", $messageString, 'Incorrect "Cc" header!');
         $this->assertStringContainsString("Return-Path: <{$returnPath}>", $messageString, 'Incorrect "Return-Path" header!');
-        $this->assertStringContainsString("X-Priority: 2 (High)", $messageString, 'Incorrect "Priority" header!');
+        $this->assertStringContainsString('X-Priority: 2 (High)', $messageString, 'Incorrect "Priority" header!');
     }
 
     public function testSend(): void
@@ -170,7 +170,7 @@ final class MessageTest extends TestCase
         $this->assertTrue($message->send());
 
         $attachment = $this->getAttachment($message);
-        $this->assertTrue(is_object($attachment), 'No attachment found!');
+        $this->assertIsObject($attachment, 'No attachment found!');
         $this->assertStringContainsString("attachment filename: $fileName", $attachment->asDebugString(), 'Invalid file name!');
     }
 
@@ -194,7 +194,7 @@ final class MessageTest extends TestCase
 
         $this->assertTrue($message->send());
         $attachment = $this->getAttachment($message);
-        $this->assertTrue(is_object($attachment), 'No attachment found!');
+        $this->assertIsObject($attachment, 'No attachment found!');
         $this->assertStringContainsString("attachment filename: $fileName", $attachment->asDebugString(), 'Invalid file name!');
         $this->assertStringContainsString('image/png', $attachment->asDebugString(), 'Invalid content type!');
     }
@@ -219,9 +219,9 @@ final class MessageTest extends TestCase
         $this->assertTrue($message->send());
 
         $attachment = $this->getAttachment($message);
-        $this->assertTrue(is_object($attachment), 'No attachment found!');
+        $this->assertIsObject($attachment, 'No attachment found!');
         $this->assertStringContainsString(" filename: $fileName", $attachment->asDebugString(), 'Invalid file name!');
-        $this->assertStringContainsString(" disposition: inline", $attachment->asDebugString(), 'Invalid disposition!');
+        $this->assertStringContainsString(' disposition: inline', $attachment->asDebugString(), 'Invalid disposition!');
     }
 
     /**
@@ -251,10 +251,10 @@ final class MessageTest extends TestCase
         $this->assertTrue($message->send());
 
         $attachment = $this->getAttachment($message);
-        $this->assertTrue(is_object($attachment), 'No attachment found!');
+        $this->assertIsObject($attachment, 'No attachment found!');
         $this->assertStringContainsString(" filename: $fileName", $attachment->asDebugString(), 'Invalid file name!');
         $this->assertStringContainsString($contentType, $attachment->asDebugString(), 'Invalid content type!');
-        $this->assertStringContainsString(" disposition: inline", $attachment->asDebugString(), 'Invalid disposition!');
+        $this->assertStringContainsString(' disposition: inline', $attachment->asDebugString(), 'Invalid disposition!');
     }
 
     /**
@@ -302,6 +302,7 @@ final class MessageTest extends TestCase
         $unserializedMessage = unserialize(serialize($message));
         $this->assertNull($unserializedMessage->mailer);
     }
+
     /**
      * @depends testSendAlternativeBody
      */
@@ -373,7 +374,7 @@ final class MessageTest extends TestCase
     /**
      * Finds the attachment object in the message.
      * @param  Message                     $message message instance
-     * @return null|DataPart attachment instance.
+     * @return DataPart|null attachment instance.
      */
     protected function getAttachment(Message $message): ?DataPart
     {
@@ -394,7 +395,7 @@ final class MessageTest extends TestCase
      */
     private function getTestFilePath(): string
     {
-        return Yii::getAlias('@yiiunit/extensions/symfonymailer/runtime') . DIRECTORY_SEPARATOR . basename(get_class($this)) . '_' . getmypid();
+        return Yii::getAlias('@yiiunit/extensions/symfonymailer/runtime') . DIRECTORY_SEPARATOR . basename(self::class) . '_' . getmypid();
     }
 
     /**
@@ -402,11 +403,9 @@ final class MessageTest extends TestCase
      */
     private function createTestEmailComponent(): Mailer
     {
-        $component = new Mailer([
+        return new Mailer([
             'useFileTransport' => true,
         ]);
-
-        return $component;
     }
 
     /**

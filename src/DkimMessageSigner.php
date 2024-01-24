@@ -17,6 +17,7 @@ use Symfony\Component\Mime\Message;
 final class DkimMessageSigner implements MessageSignerInterface
 {
     private DkimSigner $dkimSigner;
+
     public function __construct(DkimSigner $dkimSigner)
     {
         $this->dkimSigner = $dkimSigner;
