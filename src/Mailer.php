@@ -42,11 +42,11 @@ class Mailer extends BaseMailer
      * @var array<mixed>
      */
     public array $signerOptions = [];
+    public ?Transport $transportFactory = null;
     /**
      * @var null|TransportInterface Symfony transport instance or its array configuration.
      */
     private ?TransportInterface $_transport = null;
-    public ?Transport $transportFactory = null;
 
     /**
      * @param TransportConfigArray|TransportInterface $transport
@@ -55,6 +55,28 @@ class Mailer extends BaseMailer
     public function setTransport(array|TransportInterface $transport): void
     {
         $this->_transport = $transport instanceof TransportInterface ? $transport : $this->createTransport($transport);
+    }
+
+    protected function sendMessage($message): bool
+    {
+        if (!($message instanceof MessageWrapperInterface)) {
+            throw new InvalidArgumentException(sprintf(
+                'The message must be an instance of "%s". The "%s" instance is received.',
+                MessageWrapperInterface::class,
+                get_class($message),
+            ));
+        }
+
+        $message = $message->getSymfonyEmail();
+        if ($this->encrypter !== null) {
+            $message = $this->encrypter->encrypt($message);
+        }
+
+        if ($this->signer !== null) {
+            $message = $this->signer->sign($message, $this->signerOptions);
+        }
+        $this->getTransport()->send($message);
+        return true;
     }
 
     private function getTransport(): TransportInterface
@@ -105,27 +127,5 @@ class Mailer extends BaseMailer
             throw new InvalidConfigException('Transport configuration array must contain either "dsn", or "scheme" and "host" keys.');
         }
         return $transport;
-    }
-
-    protected function sendMessage($message): bool
-    {
-        if (!($message instanceof MessageWrapperInterface)) {
-            throw new InvalidArgumentException(sprintf(
-                'The message must be an instance of "%s". The "%s" instance is received.',
-                MessageWrapperInterface::class,
-                get_class($message),
-            ));
-        }
-
-        $message = $message->getSymfonyEmail();
-        if ($this->encrypter !== null) {
-            $message = $this->encrypter->encrypt($message);
-        }
-
-        if ($this->signer !== null) {
-            $message = $this->signer->sign($message, $this->signerOptions);
-        }
-        $this->getTransport()->send($message);
-        return true;
     }
 }

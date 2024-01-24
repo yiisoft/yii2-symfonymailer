@@ -16,22 +16,17 @@
                 "conditions": []
             },
             {
-                "action": "vendor/bin/phpunit",
+                "action": "composer test",
                 "options": [],
                 "conditions": []
             },
             {
-                "action": "vendor/bin/ecs",
+                "action": "composer check-dependencies",
                 "options": [],
                 "conditions": []
             },
             {
-                "action": "vendor/bin/psalm",
-                "options": [],
-                "conditions": []
-            },
-            {
-                "action": "vendor/bin/phpstan",
+                "action": "composer psalm",
                 "options": [],
                 "conditions": []
             }
