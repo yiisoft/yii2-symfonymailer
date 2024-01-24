@@ -35,9 +35,9 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
 
     protected function getVendorPath()
     {
-        $vendor = dirname(dirname(__DIR__)) . '/vendor';
+        $vendor = dirname(__DIR__, 2) . '/vendor';
         if (!is_dir($vendor)) {
-            $vendor = dirname(dirname(dirname(dirname(__DIR__))));
+            $vendor = dirname(__DIR__, 4);
         }
         return $vendor;
     }

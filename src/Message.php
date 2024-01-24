@@ -24,7 +24,7 @@ use yii\mail\BaseMessage;
  * @psalm-type PsalmAddressList array<int|string, string>|string
  *
  * @property PsalmAddressList $bcc The type defined by the message interface is not strict enough.
- * @property-read Email $symfonyEmail Symfony email instance.
+ * @property Email $symfonyEmail Symfony email instance.
  *
  * @extendable
  */
@@ -315,7 +315,7 @@ class Message extends BaseMessage implements MessageWrapperInterface
     }
 
     /**
-     * @param string|list<string> $value
+     * @param list<string>|string $value
      */
     public function setHeader(string $name, array|string $value): self
     {
@@ -331,7 +331,7 @@ class Message extends BaseMessage implements MessageWrapperInterface
     }
 
     /**
-     * @param array<string, string|list<string>> $headers
+     * @param array<string, list<string>|string> $headers
      * @return $this
      */
     public function setHeaders(array $headers): self
