@@ -16,6 +16,10 @@ composer run check-dependencies
 The code is checked with [Easy Coding Standard](https://github.com/easy-coding-standard/easy-coding-standard) and
 [PHP CS Fixer](https://github.com/PHP-CS-Fixer/PHP-CS-Fixer). To run it:
 
+```shell
+composer run ecs
+```
+
 ## Mutation testing
 
 Mutation testing is checked with [Infection](https://infection.github.io/). To run it:
