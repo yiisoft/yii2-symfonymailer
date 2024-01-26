@@ -14,6 +14,8 @@ For license information check the [LICENSE](LICENSE.md)-file.
 [![Total Downloads](https://poser.pugx.org/yiisoft/yii2-symfonymailer/downloads.png)](https://packagist.org/packages/yiisoft/yii2-symfonymailer)
 [![Build Status](https://github.com/yiisoft/yii2-symfonymailer/workflows/build/badge.svg)](https://github.com/yiisoft/yii2-symfonymailer/actions)
 [![codecov](https://codecov.io/gh/yiisoft/yii2-symfonymailer/graph/badge.svg?token=XCj60xP699)](https://codecov.io/gh/yiisoft/yii2-symfonymailer)
+[![static analysis](https://github.com/yiisoft/yii2-symfonymailer/actions/workflows/static.yml/badge.svg)](https://github.com/yiisoft/yii2-symfonymailer/actions/workflows/static.yml)
+[![type-coverage](https://shepherd.dev/github/yiisoft/yii2-symfonymailer/coverage.svg)](https://shepherd.dev/github/yiisoft/yii2-symfonymailer)
 
 Requirements
 ------------
