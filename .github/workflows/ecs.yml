@@ -23,7 +23,7 @@ name: ecs
 
 jobs:
   easy-coding-standard:
-    uses: yiisoft/actions/.github/workflows/ecs.yml@add-ecs-workflow-
+    uses: yiisoft/actions/.github/workflows/ecs.yml@master
     with:
       os: >-
         ['ubuntu-latest']
