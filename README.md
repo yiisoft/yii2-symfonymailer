@@ -114,48 +114,61 @@ Swiftmailer default transport was the `SendmailTransport`, while with this exten
        ],
    ],
    ```
-With this extension, you do not have an ability of directly setting timeout that was possible with Swiftmailer extension. The reason is, the underlying Symfony package defines its classes as `final` thereby discouraging inheritance and pushing towards composition. To achieve timeout (and other transport configurations), you will need to define factory class. Below is an example for SMTP transport.
+With this extension, you do not have an ability of directly setting timeout, or other configurations that were possible with Swiftmailer extension. The reason is, the underlying Symfony package defines its classes as `final` thereby discouraging inheritance and pushing towards composition. 
+
+To achieve timeout, for example (and other transport configurations supported), you will need to define factory class and override default transport factory you are interested to replace through [Yii DI container](https://www.yiiframework.com/doc/guide/2.0/en/concept-di-container) definitions.
+
+Below is an example that shows you how to ovveride timeout.
+
+First define your custom factory class.
 
 ```php
-namespace app\utils; //file is in utils folder of your application
+namespace app\utils;
 
-use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
+use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\Smtp\SmtpTransport;
+use Symfony\Component\Mailer\Transport\TransportFactoryInterface;
+use Symfony\Component\Mailer\Transport\TransportInterface;
+use yii\base\BaseObject;
 
-class CustomSmtpFactory implements TransportFactoryInterface {
-    public function __construct(private TransportFactoryInterface $factory, private float $timeout)
-    {
-        $this->timeout = 120;
-    }
+final class CustomSmtpFactory extends BaseObject implements TransportFactoryInterface
+{
+    public float $timeout;
 
     public function create(Dsn $dsn): TransportInterface
     {
-        $result = $this->factory->create($dsn);
-        if ($result instanceof SmtpTransport) {
-            //Setup timeout to this or 
-            $result->getStream()->setTimeout($this->timeout);
+        $transport = $this->create($dsn);
+        if ($transport instanceof SmtpTransport) {
+
+            /** @var SocketStream $stream */
+            $stream = $transport->getStream();
+            $stream->setTimeout($this->timeout);
         }
-        return $result;
+        return $transport;
     }
 
-    public function supports(Dsn $dsn): bool {
-        return $this->factory->supports($dsn);
+    public function supports(Dsn $dsn): bool
+    {
+        return $dsn->getScheme() == 'smtp';
     }
 }
 ```
 
-then in configuration, set the factory
+Then in the root of web configuration, set the factory class in container definitions, thereby overriding the default class.
 
 ```php
-   'mailer' => [
-       'class' => yii\symfonymailer\Mailer::class,
-       'transportFactory' => app\utils\CustomSmtpFactory::class,
-        'transport' => [
-            'scheme' => 'smtp',
-            //other settings
+'container' => [
+    'definitions' => [
+        EsmtpTransportFactory::class => [
+            'class' => CustomSmtpFactory::class,
+            'timeout' => 143, //Configure it to your own timeout
         ],
-   ],
+        // ... other definitions
+    ],
+],
   ```
+
+That is all you need to do. The extension should use your new class and its configuration settings.
 
 Security implications of the DSN
 --------------------------------
