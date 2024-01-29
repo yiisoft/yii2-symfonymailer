@@ -10,7 +10,6 @@ declare(strict_types=1);
 
 namespace yii\symfonymailer;
 
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Transport\Dsn;
 use Symfony\Component\Mailer\Transport\NativeTransportFactory;
@@ -85,7 +84,6 @@ class Mailer extends BaseMailer
 
     /**
      * @psalm-suppress UndefinedClass
-     * @return Transport
      * @throws InvalidConfigException
      * @throws \yii\di\NotInstantiableException
      */
@@ -111,7 +109,7 @@ class Mailer extends BaseMailer
                 OhMySmtpTransportFactory::class,
                 PostmarkTransportFactory::class,
                 SendgridTransportFactory::class,
-                SendinblueTransportFactory::class
+                SendinblueTransportFactory::class,
             ] as $factoryClass) {
                 if (!class_exists($factoryClass)) {
                     continue;
@@ -157,7 +155,6 @@ class Mailer extends BaseMailer
 
     /**
      * @param MessageWrapperInterface&MessageInterface $message
-     * @return bool
      * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface
      */
     protected function sendMessage($message): bool

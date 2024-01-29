@@ -6,7 +6,6 @@ namespace yiiunit\extensions\symfonymailer;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Mailer\Transport;
-use Symfony\Component\Mailer\Transport\NullTransportFactory;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Yii;
 use yii\base\InvalidArgumentException;
@@ -188,7 +187,5 @@ final class MailerTest extends TestCase
         $mailer->setTransport([
             'dsn' => 'null://null',
         ]);
-
-
     }
 }
