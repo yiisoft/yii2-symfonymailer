@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace yiiunit\extensions\symfonymailer;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Yii;
 use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
+use yii\di\Container;
 use yii\mail\MessageInterface;
 use yii\symfonymailer\Mailer;
 use yii\symfonymailer\Message;
@@ -163,5 +165,27 @@ final class MailerTest extends TestCase
         $message = $this->getMockBuilder(MessageInterface::class)->getMock();
 
         $mailer->send($message);
+    }
+
+    public function testDiContainer(): void
+    {
+        \Yii::$container = new Container();
+
+        $dispatcherMock = $this->getMockBuilder(EventDispatcherInterface::class)->getMock();
+        $dispatcherCreator = $this
+            ->getMockBuilder(\stdclass::class)
+            ->addMethods(['__invoke'])
+            ->getMock();
+
+        $dispatcherCreator
+            ->expects(self::atLeastOnce())
+            ->method('__invoke')->willReturn($dispatcherMock);
+        \Yii::$container->set(EventDispatcherInterface::class, $dispatcherCreator);
+
+
+        $mailer = new Mailer();
+        $mailer->setTransport([
+            'dsn' => 'null://null',
+        ]);
     }
 }

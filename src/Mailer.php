@@ -1,21 +1,37 @@
 <?php
+
 /**
  * @link https://www.yiiframework.com/
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license https://www.yiiframework.com/license/
  */
+
 declare(strict_types=1);
 
 namespace yii\symfonymailer;
 
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Transport\Dsn;
+use Symfony\Component\Mailer\Transport\NativeTransportFactory;
+use Symfony\Component\Mailer\Transport\NullTransportFactory;
+use Symfony\Component\Mailer\Transport\SendmailTransportFactory;
+use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransportFactory;
 use Symfony\Component\Mailer\Transport\TransportInterface;
+use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesTransportFactory;
+use Symfony\Component\Mailer\Bridge\Google\Transport\GmailTransportFactory;
+use Symfony\Component\Mailer\Bridge\Infobip\Transport\InfobipTransportFactory;
+use Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillTransportFactory;
+use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory;
+use Symfony\Component\Mailer\Bridge\Mailjet\Transport\MailjetTransportFactory;
+use Symfony\Component\Mailer\Bridge\OhMySmtp\Transport\OhMySmtpTransportFactory;
+use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory;
+use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory;
+use Symfony\Component\Mailer\Bridge\Sendinblue\Transport\SendinblueTransportFactory;
+use Yii;
 use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
 use yii\mail\BaseMailer;
-use yii\psr\DynamicLogger;
+use yii\mail\MessageInterface;
 
 /**
  * @psalm-suppress PropertyNotSetInConstructor
@@ -66,16 +82,46 @@ class Mailer extends BaseMailer
         return $this->_transport;
     }
 
+    /**
+     * @psalm-suppress UndefinedClass
+     * @throws InvalidConfigException
+     * @throws \yii\di\NotInstantiableException
+     */
     private function getTransportFactory(): Transport
     {
         if (isset($this->transportFactory)) {
             return $this->transportFactory;
         }
-        /** @var LoggerInterface|null $logger */
-        $logger = class_exists(DynamicLogger::class) ? new DynamicLogger() : null;
-        $defaultFactories = Transport::getDefaultFactories(new EventDispatcherProxy($this), null, $logger);
+        // Use the Yii DI container, if available.
+        if (isset(\Yii::$container)) {
+            $factories = [];
+            foreach ([
+                NullTransportFactory::class,
+                SendmailTransportFactory::class,
+                EsmtpTransportFactory::class,
+                NativeTransportFactory::class,
+                SesTransportFactory::class,
+                GmailTransportFactory::class,
+                InfobipTransportFactory::class,
+                MandrillTransportFactory::class,
+                MailgunTransportFactory::class,
+                MailjetTransportFactory::class,
+                OhMySmtpTransportFactory::class,
+                PostmarkTransportFactory::class,
+                SendgridTransportFactory::class,
+                SendinblueTransportFactory::class,
+            ] as $factoryClass) {
+                if (!class_exists($factoryClass)) {
+                    continue;
+                }
+                $factories[] = \Yii::$container->get($factoryClass);
+            }
+        } else {
+            $factories = Transport::getDefaultFactories();
+        }
+
         /** @psalm-suppress InvalidArgument Symfony's type annotation is wrong */
-        return new Transport($defaultFactories);
+        return new Transport($factories);
     }
 
     /**
@@ -107,6 +153,10 @@ class Mailer extends BaseMailer
         return $transport;
     }
 
+    /**
+     * @param MessageWrapperInterface&MessageInterface $message
+     * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface
+     */
     protected function sendMessage($message): bool
     {
         if (!($message instanceof MessageWrapperInterface)) {
