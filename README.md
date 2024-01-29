@@ -160,7 +160,7 @@ Then in the root of web configuration, set the factory class in container defini
 'container' => [
     'definitions' => [
         EsmtpTransportFactory::class => [
-            'class' => CustomSmtpFactory::class,
+            'class' => \app\utils\CustomSmtpFactory::class,
             'timeout' => 143, //Configure it to your own timeout
         ],
         // ... other definitions
