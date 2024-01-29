@@ -94,6 +94,11 @@ Yii::$app->mailer->compose('contact/html')
      ->send();
 ```
 
+DI Container
+------------
+The `Mailer` component will automatically use the DI container when it is available.
+This allows you to easily override the transport factory configurations or their dependencies.
+
 Migrating from yiisoft/yii2-swiftmailer
 ---------------------------------------
 
