@@ -93,7 +93,7 @@ class Mailer extends BaseMailer
             return $this->transportFactory;
         }
         // Use the Yii DI container, if available.
-        if (isset(\Yii::$container)) {
+        if (isset(Yii::$container)) {
             $factories = [];
             foreach ([
                 NullTransportFactory::class,
@@ -114,7 +114,7 @@ class Mailer extends BaseMailer
                 if (!class_exists($factoryClass)) {
                     continue;
                 }
-                $factories[] = \Yii::$container->get($factoryClass);
+                $factories[] = Yii::$container->get($factoryClass);
             }
         } else {
             $factories = Transport::getDefaultFactories();
@@ -154,7 +154,7 @@ class Mailer extends BaseMailer
     }
 
     /**
-     * @param MessageWrapperInterface&MessageInterface $message
+     * @param MessageInterface&MessageWrapperInterface $message
      * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface
      */
     protected function sendMessage($message): bool
