@@ -1,5 +1,15 @@
 {
     "symbol-whitelist": [
+        "Symfony\\Component\\Mailer\\Bridge\\Amazon\\Transport\\SesTransportFactory",
+        "Symfony\\Component\\Mailer\\Bridge\\Google\\Transport\\GmailTransportFactory",
+        "Symfony\\Component\\Mailer\\Bridge\\Infobip\\Transport\\InfobipTransportFactory",
+        "Symfony\\Component\\Mailer\\Bridge\\Mailchimp\\Transport\\MandrillTransportFactory",
+        "Symfony\\Component\\Mailer\\Bridge\\Mailgun\\Transport\\MailgunTransportFactory",
+        "Symfony\\Component\\Mailer\\Bridge\\Mailjet\\Transport\\MailjetTransportFactory",
+        "Symfony\\Component\\Mailer\\Bridge\\OhMySmtp\\Transport\\OhMySmtpTransportFactory",
+        "Symfony\\Component\\Mailer\\Bridge\\Postmark\\Transport\\PostmarkTransportFactory",
+        "Symfony\\Component\\Mailer\\Bridge\\Sendgrid\\Transport\\SendgridTransportFactory",
+        "Symfony\\Component\\Mailer\\Bridge\\Sendinblue\\Transport\\SendinblueTransportFactory",
         "yii\\psr\\DynamicLogger"
     ]
 }
