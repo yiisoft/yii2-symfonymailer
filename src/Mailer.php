@@ -84,6 +84,7 @@ class Mailer extends BaseMailer
 
     /**
      * @psalm-suppress UndefinedClass
+     * @psalm-suppress RedundantConditionGivenDocblockType
      * @throws InvalidConfigException
      * @throws \yii\di\NotInstantiableException
      */
@@ -92,6 +93,7 @@ class Mailer extends BaseMailer
         if (isset($this->transportFactory)) {
             return $this->transportFactory;
         }
+
         // Use the Yii DI container, if available.
         if (isset(Yii::$container)) {
             $factories = [];
@@ -120,7 +122,7 @@ class Mailer extends BaseMailer
             $factories = Transport::getDefaultFactories();
         }
 
-        /** @psalm-suppress InvalidArgument Symfony's type annotation is wrong */
+        /** @psalm-var array<array-key, \Symfony\Component\Mailer\Transport\TransportFactoryInterface> $factories */
         return new Transport($factories);
     }
 
@@ -154,7 +156,7 @@ class Mailer extends BaseMailer
     }
 
     /**
-     * @param MessageInterface&MessageWrapperInterface $message
+     * @param MessageInterface|MessageWrapperInterface $message
      * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface
      */
     protected function sendMessage($message): bool
