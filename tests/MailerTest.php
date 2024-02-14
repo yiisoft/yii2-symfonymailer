@@ -169,7 +169,7 @@ final class MailerTest extends TestCase
 
     public function testDiContainer(): void
     {
-        \Yii::$container = new Container();
+        Yii::$container = new Container();
 
         $dispatcherMock = $this->getMockBuilder(EventDispatcherInterface::class)->getMock();
         $dispatcherCreator = $this
@@ -180,7 +180,7 @@ final class MailerTest extends TestCase
         $dispatcherCreator
             ->expects(self::atLeastOnce())
             ->method('__invoke')->willReturn($dispatcherMock);
-        \Yii::$container->set(EventDispatcherInterface::class, $dispatcherCreator);
+        Yii::$container->set(EventDispatcherInterface::class, $dispatcherCreator);
 
 
         $mailer = new Mailer();
