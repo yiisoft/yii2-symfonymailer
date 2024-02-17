@@ -26,6 +26,7 @@
 /CHANGELOG.md		merge=union
 
 # Exclude files from the archive
+/.editorconfig                  export-ignore
 /.gitattributes                 export-ignore
 /.github                        export-ignore
 /.gitignore                     export-ignore
@@ -33,6 +34,8 @@
 /codeception.yml                export-ignore
 /composer-require-checker.json  export-ignore
 /docs                           export-ignore
+/ecs.php                        export-ignore
+/infection.json.dist            export-ignore
 /phpunit.xml.dist               export-ignore
 /psalm.xml                      export-ignore
 /rector.php                     export-ignore
