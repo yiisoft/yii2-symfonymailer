@@ -6,7 +6,7 @@
     <br>
 </p>
 
-This extension provides a [Symfony Mailer](https://symfony.com/doc/5.4/mailer.html) mail solution for [Yii framework 2.0](http://www.yiiframework.com).
+This extension provides a [Symfony Mailer](https://symfony.com/doc/5.4/mailer.html) mail solution for [Yii framework 2.0](https://www.yiiframework.com).
 
 For license information check the [LICENSE](LICENSE.md)-file.
 
@@ -25,7 +25,7 @@ Requirements
 Installation
 ------------
 
-The preferred way to install this extension is through [composer](http://getcomposer.org/download/).
+The preferred way to install this extension is through [composer](https://getcomposer.org/download/).
 
 Either run
 
