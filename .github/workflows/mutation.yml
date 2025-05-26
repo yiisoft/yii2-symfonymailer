@@ -26,7 +26,3 @@ jobs:
       STRYKER_DASHBOARD_API_KEY: ${{ secrets.STRYKER_DASHBOARD_API_KEY }}
     with:
       extensions: runkit7
-      os: >-
-        ['ubuntu-latest']
-      php: >-
-        ['8.1']

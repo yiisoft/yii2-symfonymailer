@@ -244,7 +244,7 @@ class Message extends BaseMessage implements MessageWrapperInterface
         $this->email->attachFromPath(
             $fileName,
             $options['fileName'] ?? $fileName,
-            $options['contentType'] ?? FileHelper::getMimeType($fileName)
+            $options['contentType'] ?? FileHelper::getMimeType($fileName),
         );
         return $this;
     }
@@ -272,7 +272,7 @@ class Message extends BaseMessage implements MessageWrapperInterface
         $this->email->embedFromPath(
             $fileName,
             $name,
-            $options['contentType'] ?? FileHelper::getMimeType($fileName)
+            $options['contentType'] ?? FileHelper::getMimeType($fileName),
         );
         return 'cid:' . $name;
     }
