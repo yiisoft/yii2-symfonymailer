@@ -5,6 +5,7 @@ Yii Framework 2 Symfony mailer extension Change Log
 -----------------------
 
 - Enh #80: Add support for Azure Email Communication Services (bijoys)
+- Enh #81: Remove unnecessary files from Composer package (@s1lver)
 
 4.0.0 Jan 29, 2024
 ------------------
