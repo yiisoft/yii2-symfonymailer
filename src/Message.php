@@ -30,8 +30,8 @@ use yii\mail\BaseMessage;
  */
 class Message extends BaseMessage implements MessageWrapperInterface
 {
-    private Email $email;
-    private string $charset = 'utf-8';
+    protected Email $email;
+    protected string $charset = 'utf-8';
 
     /**
      * @param array<string, mixed> $config
