@@ -13,9 +13,6 @@ use yii\symfonymailer\Message;
 Yii::setAlias('@yii/symfonymailer', __DIR__ . '/../../../../extensions/symfonymailer');
 
 /**
- * @group vendor
- * @group mail
- * @group symfonymailer
  * @covers \yii\symfonymailer\Message
  */
 final class MessageTest extends TestCase
