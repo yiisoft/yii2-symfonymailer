@@ -30,7 +30,6 @@ jobs:
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
     with:
-      codecovFailCiIfError: false
       composer-command: composer update --prefer-dist --no-interaction --no-progress --optimize-autoloader --ansi --ignore-platform-req=php+
       os: >-
         ['ubuntu-latest']
