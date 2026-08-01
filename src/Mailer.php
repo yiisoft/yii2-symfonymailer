@@ -41,7 +41,6 @@ use yii\mail\MessageInterface;
  * @extendable
  *
  * @property-write TransportConfigArray|TransportInterface $transport
- *
  */
 class Mailer extends BaseMailer
 {
