@@ -39,6 +39,9 @@ use yii\mail\MessageInterface;
  * @psalm-type TransportHostArray array{scheme?:string, host?:string, username?:string, password?:string, port?:int, options?: array<mixed>, dsn?:string|Dsn }
  * @phpstan-type TransportConfigArray array{scheme?:string, host?:string, username?:string, password?:string, port?:int, options?: array<mixed>, dsn?:string|Dsn }
  * @extendable
+ *
+ * @property-write TransportConfigArray|TransportInterface $transport
+ *
  */
 class Mailer extends BaseMailer
 {
