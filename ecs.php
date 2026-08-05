@@ -5,6 +5,7 @@ declare(strict_types=1);
 use PhpCsFixer\Fixer\ClassNotation\ClassDefinitionFixer;
 use PhpCsFixer\Fixer\ClassNotation\OrderedTraitsFixer;
 use PhpCsFixer\Fixer\Import\NoUnusedImportsFixer;
+use PhpCsFixer\Fixer\Phpdoc\PhpdocNoAliasTagFixer;
 use Symplify\EasyCodingStandard\Config\ECSConfig;
 
 return ECSConfig::configure()
@@ -25,12 +26,14 @@ return ECSConfig::configure()
     ->withPreparedSets(
         arrays: true,
         cleanCode: true,
-        comments:true,
+        comments: true,
         docblocks: true,
         namespaces: true,
-        psr12: true,
-        strict: true
+        psr12: true
     )
+    ->withSkip([
+        PhpdocNoAliasTagFixer::class,
+    ])
     ->withRules(
         [
             NoUnusedImportsFixer::class,

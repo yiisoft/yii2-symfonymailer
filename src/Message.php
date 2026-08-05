@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 /**
- * @link https://www.yiiframework.com/
+ * @see https://www.yiiframework.com/
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license https://www.yiiframework.com/license/
  */
@@ -23,10 +23,21 @@ use yii\mail\BaseMessage;
  * @psalm-type PsalmFileOptions array{fileName?: string, contentType?: string}
  * @psalm-type PsalmAddressList array<int|string, string>|string
  *
- * @property PsalmAddressList $bcc The type defined by the message interface is not strict enough.
- * @property Email $symfonyEmail Symfony email instance.
+ * @property-read array<string, string>|string $bcc
+ * @property-write PsalmAddressList $bcc The type defined by the message interface is not strict enough.
+ * @property-read array<string,string>|string $cc
+ * @property-write PsalmAddressList $cc
+ * @property-read array<string, string>|string $from
+ * @property-write array<int|string, string>|string $from
+ * @property-write array<string, list<string>|string> $headers
+ * @property-read array<string, string>|string $replyTo
+ * @property-write PsalmAddressList $replyTo
+ * @property-read Email $symfonyEmail Symfony email instance.
+ * @property-read array<string, string>|string $to
+ * @property-write PsalmAddressList $to
  *
  * @extendable
+ * @api
  */
 class Message extends BaseMessage implements MessageWrapperInterface
 {

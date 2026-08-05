@@ -13,9 +13,6 @@ use yii\symfonymailer\Message;
 Yii::setAlias('@yii/symfonymailer', __DIR__ . '/../../../../extensions/symfonymailer');
 
 /**
- * @group vendor
- * @group mail
- * @group symfonymailer
  * @covers \yii\symfonymailer\Message
  */
 final class MessageTest extends TestCase
@@ -88,7 +85,6 @@ final class MessageTest extends TestCase
         $textColor = imagecolorallocate($image, 233, 14, 91);
         imagestring($image, 1, 5, 5, $text, $textColor);
         imagejpeg($image, $fileFullName);
-        imagedestroy($image);
 
         return $fileFullName;
     }

@@ -4,6 +4,11 @@ Yii Framework 2 Symfony mailer extension Change Log
 4.0.1 under development
 -----------------------
 
+- Enh #80: Add support for Azure Email Communication Services (bijoys)
+- Enh #81: Remove unnecessary files from Composer package (@s1lver)
+- Ehn #84: Add support for Symfony Mailer v8 (rntluca)
+- Bug #91: Add missing `@property` annotations in `Mailer` and `Message` (mspirkov)
+
 4.0.0 Jan 29, 2024
 ------------------
 

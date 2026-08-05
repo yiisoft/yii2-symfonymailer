@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @link https://www.yiiframework.com/
+ * @see https://www.yiiframework.com/
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license https://www.yiiframework.com/license/
  */
@@ -18,6 +18,7 @@ use Symfony\Component\Mailer\Transport\SendmailTransportFactory;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransportFactory;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesTransportFactory;
+use Symfony\Component\Mailer\Bridge\Azure\Transport\AzureTransportFactory;
 use Symfony\Component\Mailer\Bridge\Google\Transport\GmailTransportFactory;
 use Symfony\Component\Mailer\Bridge\Infobip\Transport\InfobipTransportFactory;
 use Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillTransportFactory;
@@ -38,6 +39,9 @@ use yii\mail\MessageInterface;
  * @psalm-type TransportHostArray array{scheme?:string, host?:string, username?:string, password?:string, port?:int, options?: array<mixed>, dsn?:string|Dsn }
  * @phpstan-type TransportConfigArray array{scheme?:string, host?:string, username?:string, password?:string, port?:int, options?: array<mixed>, dsn?:string|Dsn }
  * @extendable
+ * @api
+ *
+ * @property-write TransportConfigArray|TransportInterface $transport
  */
 class Mailer extends BaseMailer
 {
@@ -103,6 +107,7 @@ class Mailer extends BaseMailer
                 EsmtpTransportFactory::class,
                 NativeTransportFactory::class,
                 SesTransportFactory::class,
+                AzureTransportFactory::class,
                 GmailTransportFactory::class,
                 InfobipTransportFactory::class,
                 MandrillTransportFactory::class,
