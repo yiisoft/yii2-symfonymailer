@@ -1,6 +1,7 @@
 {
     "symbol-whitelist": [
         "Symfony\\Component\\Mailer\\Bridge\\Amazon\\Transport\\SesTransportFactory",
+        "Symfony\\Component\\Mailer\\Bridge\\Azure\\Transport\\AzureTransportFactory",
         "Symfony\\Component\\Mailer\\Bridge\\Google\\Transport\\GmailTransportFactory",
         "Symfony\\Component\\Mailer\\Bridge\\Infobip\\Transport\\InfobipTransportFactory",
         "Symfony\\Component\\Mailer\\Bridge\\Mailchimp\\Transport\\MandrillTransportFactory",

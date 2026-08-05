@@ -123,8 +123,7 @@ final class MailerTest extends TestCase
 
     public function testConfigureTransportInvalidArray(): void
     {
-        $transportConfig = [
-        ];
+        $transportConfig = [];
         $mailer = new Mailer();
         $this->expectException(InvalidConfigException::class);
         $mailer->setTransport($transportConfig);

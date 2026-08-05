@@ -33,7 +33,7 @@ composer run mutation
 The code is statically analyzed with [Psalm](https://psalm.dev/). To run static analysis:
 
 ```shell
-composer run psalm
+composer run static
 ```
 
 ## Unit tests
@@ -41,5 +41,5 @@ composer run psalm
 The code is tested with [PHPUnit](https://phpunit.de/). To run tests:
 
 ```
-composer run test
+composer run tests
 ```

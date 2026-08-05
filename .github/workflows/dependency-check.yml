@@ -1,3 +1,6 @@
+permissions:
+  contents: read
+
 on:
   pull_request:
     paths-ignore:
@@ -26,3 +29,8 @@ name: dependency-check
 jobs:
   composer-require-checker:
     uses: yiisoft/actions/.github/workflows/composer-require-checker.yml@master
+    with:
+      os: >-
+        ['ubuntu-latest']
+      php: >-
+        ['8.3', '8.4', '8.5']
