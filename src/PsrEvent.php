@@ -10,6 +10,8 @@ use yii\base\Event;
  * This class wraps a PSR-14 event object. Note that PSR-14 does not place any demands on an event object.
  * In Yii all events are stoppable, in PSR-14 this is not the case. For this implementation we force all events to be
  * stoppable
+ *
+ * @property-read object $originalEvent
  */
 final class PsrEvent extends Event
 {

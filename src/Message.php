@@ -23,18 +23,39 @@ use yii\mail\BaseMessage;
  * @psalm-type PsalmFileOptions array{fileName?: string, contentType?: string}
  * @psalm-type PsalmAddressList array<int|string, string>|string
  *
- * @property-read array<string, string>|string $bcc
+ * @property-read array<string, string>|string $bcc The Bcc (hidden copy receiver) addresses of this message.
  * @property-write PsalmAddressList $bcc The type defined by the message interface is not strict enough.
- * @property-read array<string,string>|string $cc
- * @property-write PsalmAddressList $cc
- * @property-read array<string, string>|string $from
- * @property-write array<int|string, string>|string $from
+ * @property-read array<string, string>|string $cc The Cc (additional copy receiver) addresses of this message.
+ * @property-write PsalmAddressList $cc Copy receiver email address.
+ * You may pass an array of addresses if multiple recipients should receive this message.
+ * You may also specify receiver name in addition to email address using format:
+ * `[email => name]`.
+ * @property-read array<string, string>|string $from The sender.
+ * @property-write array<int|string, string>|string $from Sender email address.
+ * You may pass an array of addresses if this message is from multiple people.
+ * You may also specify sender name in addition to email address using format:
+ * `[email => name]`.
  * @property-write array<string, list<string>|string> $headers
- * @property-read array<string, string>|string $replyTo
- * @property-write PsalmAddressList $replyTo
+ * @property-read array<string, string>|string $replyTo The reply-to address of this message.
+ * @property-write PsalmAddressList $replyTo The reply-to address.
+ * You may pass an array of addresses if this message should be replied to multiple people.
+ * You may also specify reply-to name in addition to email address using format:
+ * `[email => name]`.
  * @property-read Email $symfonyEmail Symfony email instance.
- * @property-read array<string, string>|string $to
- * @property-write PsalmAddressList $to
+ * @property-read array<string, string>|string $to The message recipients.
+ * @property-write PsalmAddressList $to Receiver email address.
+ * You may pass an array of addresses if multiple recipients should receive this message.
+ * You may also specify receiver name in addition to email address using format:
+ * `[email => name]`.
+ * @property string $charset The character set of this message.
+ * @property string $subject The message subject.
+ * @property-read DateTimeImmutable|null $date
+ * @property-write DateTimeInterface $date
+ * @property int $priority
+ * @property string $returnPath
+ * @property string $sender
+ * @property-write string $textBody Message plain text content.
+ * @property-write string $htmlBody Message HTML content.
  *
  * @extendable
  */
