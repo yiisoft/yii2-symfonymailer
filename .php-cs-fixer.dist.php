@@ -11,9 +11,6 @@ $finder = (new Finder())
     ->in([
         __DIR__ . '/src',
         __DIR__ . '/tests',
-    ])
-    ->notPath([
-        '#(^|/)data/#',
     ]);
 
 return (new Config())
