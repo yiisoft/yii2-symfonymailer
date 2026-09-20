@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @see https://www.yiiframework.com/
+ * @link https://www.yiiframework.com/
  * @copyright Copyright (c) 2008 Yii Software LLC
  * @license https://www.yiiframework.com/license/
  */
@@ -100,7 +100,8 @@ class Mailer extends BaseMailer
         // Use the Yii DI container, if available.
         if (isset(Yii::$container)) {
             $factories = [];
-            foreach ([
+            foreach (
+                [
                 NullTransportFactory::class,
                 SendmailTransportFactory::class,
                 EsmtpTransportFactory::class,
@@ -116,7 +117,8 @@ class Mailer extends BaseMailer
                 PostmarkTransportFactory::class,
                 SendgridTransportFactory::class,
                 SendinblueTransportFactory::class,
-            ] as $factoryClass) {
+                ] as $factoryClass
+            ) {
                 if (!class_exists($factoryClass)) {
                     continue;
                 }

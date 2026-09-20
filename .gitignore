@@ -34,3 +34,10 @@ phpunit.phar
 /tests/docker
 /tests/dockerids
 
+# local phpcs config
+phpcs.xml
+
+# PHP CS Fixer
+.php-cs-fixer.php
+.php-cs-fixer.cache
+

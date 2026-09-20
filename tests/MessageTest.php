@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * @link https://www.yiiframework.com/
+ * @copyright Copyright (c) 2008 Yii Software LLC
+ * @license https://www.yiiframework.com/license/
+ */
+
 declare(strict_types=1);
 
 namespace yiiunit\extensions\symfonymailer;
@@ -10,6 +16,7 @@ use yii\helpers\FileHelper;
 use yii\symfonymailer\Mailer;
 use yii\symfonymailer\Message;
 
+// phpcs:disable PSR1.Files.SideEffects.FoundWithSymbols
 Yii::setAlias('@yii/symfonymailer', __DIR__ . '/../../../../extensions/symfonymailer');
 
 /**

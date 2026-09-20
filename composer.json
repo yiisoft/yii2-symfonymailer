@@ -38,7 +38,10 @@
         "symplify/easy-coding-standard": "^13.2",
         "vimeo/psalm": "^5.20",
         "rector/rector": "^2.6",
-        "mspirkov/yii2-rector": "^0.1"
+        "mspirkov/yii2-rector": "^0.1",
+        "yiisoft/yii2-coding-standards": "~3.0",
+        "slevomat/coding-standard": "^8.31",
+        "friendsofphp/php-cs-fixer": "^3.95"
     },
     "suggest": {
         "yiisoft/yii2-psr-log-source": "Allows routing transport logs to your Yii2 logger"
@@ -68,12 +71,14 @@
     "config": {
         "allow-plugins": {
             "yiisoft/yii2-composer": true,
-            "infection/extension-installer": true
+            "infection/extension-installer": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true
         }
     },
     "scripts": {
+        "cs": "./vendor/bin/phpcs && ./vendor/bin/php-cs-fixer check",
+        "cs-fix": "./vendor/bin/phpcbf && ./vendor/bin/php-cs-fixer fix",
         "check-dependencies": "composer-require-checker",
-        "easy-coding-standard": "ecs check",
         "mutation": [
             "Composer\\Config::disableProcessTimeout",
             "roave-infection-static-analysis-plugin"
