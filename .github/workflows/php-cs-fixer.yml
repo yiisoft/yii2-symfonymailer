@@ -25,4 +25,4 @@ jobs:
     uses: yiisoft/yii2-actions/.github/workflows/php-cs-fixer.yml@9bfbe47bd91bc31a6ff9f0ea77ba3724d7816c3d # master
     with:
       configuration: .php-cs-fixer.dist.php
-      php-version: '["7.4"]'
+      php-version: '["8.1"]'
