@@ -39,8 +39,6 @@
         "vimeo/psalm": "^5.20",
         "rector/rector": "^2.6",
         "mspirkov/yii2-rector": "^0.1",
-        "yiisoft/yii2-coding-standards": "~3.0",
-        "slevomat/coding-standard": "^8.31",
         "friendsofphp/php-cs-fixer": "^3.95"
     },
     "suggest": {
@@ -71,13 +69,12 @@
     "config": {
         "allow-plugins": {
             "yiisoft/yii2-composer": true,
-            "infection/extension-installer": true,
-            "dealerdirect/phpcodesniffer-composer-installer": true
+            "infection/extension-installer": true
         }
     },
     "scripts": {
-        "cs": "./vendor/bin/phpcs && ./vendor/bin/php-cs-fixer check",
-        "cs-fix": "./vendor/bin/phpcbf && ./vendor/bin/php-cs-fixer fix",
+        "cs": "./vendor/bin/php-cs-fixer check",
+        "cs-fix": "./vendor/bin/php-cs-fixer fix",
         "check-dependencies": "composer-require-checker",
         "mutation": [
             "Composer\\Config::disableProcessTimeout",
