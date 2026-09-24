@@ -31,7 +31,6 @@
 /codeception.yml                export-ignore
 /composer-require-checker.json  export-ignore
 /docs                           export-ignore
-/ecs.php                        export-ignore
 /psalm.xml                      export-ignore
 /rector.php                     export-ignore
 /tests                          export-ignore
