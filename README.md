@@ -149,8 +149,12 @@ Then set the class in the mailer configuration:
 ],
 ```
 
-> [!NOTE]
-> Earlier versions of this extension used `__sleep()`. Payloads written by those versions for the `Message` class can still be unserialized. A subclass that overrides `__sleep()` must move to `__serialize()` and `__unserialize()`, because PHP no longer calls `__sleep()` on it.
+### Upgrading from 4.x
+
+Version 5.0 replaces `Message::__sleep()` with `__serialize()` and `__unserialize()`.
+
+- Payloads written by earlier versions for the `Message` class can still be unserialized.
+- A subclass that defines `__sleep()` or `__wakeup()` must move that logic to `__serialize()` and `__unserialize()`. PHP no longer calls the old methods, so the state they handled is not serialized or restored.
 
 Migrating from yiisoft/yii2-swiftmailer
 ---------------------------------------

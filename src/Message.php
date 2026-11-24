@@ -108,8 +108,10 @@ class Message extends BaseMessage implements MessageWrapperInterface
      * Restores the message from the data returned by {@see __serialize()}.
      *
      * Also accepts payloads written by earlier versions that used `__sleep()`, whose keys are the mangled names of the
-     * private properties. Unknown keys are ignored, so a subclass can call `parent::__unserialize($data)` with the
-     * whole payload and then read its own keys.
+     * private properties. When a payload holds both forms, the current keys take precedence.
+     *
+     * Unknown keys are ignored, so a subclass can call `parent::__unserialize($data)` with the whole payload and then
+     * read its own keys.
      *
      * @param array<string, mixed> $data Message data produced by serialization.
      *

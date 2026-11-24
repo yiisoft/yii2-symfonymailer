@@ -357,6 +357,27 @@ final class MessageTest extends TestCase
         $this->assertNull($unserializedMessage->mailer);
     }
 
+    public function testSendUnserializedMessageThroughApplicationMailer(): void
+    {
+        $message = $this->createTestMessage();
+
+        $message->setTo($this->testEmailReceiver);
+        $message->setFrom('someuser@somedomain.com');
+        $message->setSubject('Yii Symfony Restored Message Test');
+        $message->setTextBody('Yii Symfony restored message plain text body');
+
+        $unserializedMessage = unserialize(serialize($message));
+
+        $this->assertNull(
+            $unserializedMessage->mailer,
+            'Restored message must have no mailer assigned.',
+        );
+        $this->assertTrue(
+            $unserializedMessage->send(),
+            'Application mailer must send the message.',
+        );
+    }
+
     public function testSerializePayloadContainsOnlyEmailAndCharset(): void
     {
         $message = $this->createTestMessage();
@@ -518,6 +539,36 @@ final class MessageTest extends TestCase
             'Subject: Yii Symfony Legacy Test',
             $unserializedMessage->toString(),
             'Restored message must be renderable.',
+        );
+    }
+
+    public function testUnserializePrefersCurrentKeysOverLegacyKeys(): void
+    {
+        $legacyPrefix = "\0" . Message::class . "\0";
+
+        $email = (new Email())->subject('Yii Symfony Current Test');
+        $legacyEmail = (new Email())->subject('Yii Symfony Legacy Test');
+
+        $message = new Message();
+
+        $message->__unserialize(
+            [
+                'email' => $email,
+                'charset' => 'iso-8859-1',
+                "{$legacyPrefix}email" => $legacyEmail,
+                "{$legacyPrefix}charset" => 'windows-1251',
+            ],
+        );
+
+        $this->assertSame(
+            $email,
+            $message->getSymfonyEmail(),
+            'Current email key must take precedence.',
+        );
+        $this->assertSame(
+            'iso-8859-1',
+            $message->getCharset(),
+            'Current charset key must take precedence.',
         );
     }
 
