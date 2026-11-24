@@ -505,15 +505,15 @@ final class MessageTest extends TestCase
         );
     }
 
-    public function testUnserializeLegacySleepPayload(): void
+    public function testUnserializeSleepPayload(): void
     {
         $email = (new Email())
             ->to($this->testEmailReceiver)
             ->from('someuser@somedomain.com')
-            ->subject('Yii Symfony Legacy Test')
-            ->text('Yii Symfony legacy plain text body', 'iso-8859-1');
+            ->subject('Yii Symfony Sleep Payload Test')
+            ->text('Yii Symfony sleep payload plain text body', 'iso-8859-1');
 
-        $unserializedMessage = unserialize($this->createLegacySerializedMessage($email, 'iso-8859-1'));
+        $unserializedMessage = unserialize($this->createSleepSerializedMessage($email, 'iso-8859-1'));
 
         $this->assertInstanceOf(
             Message::class,
@@ -526,7 +526,7 @@ final class MessageTest extends TestCase
             'Symfony email must be restored.',
         );
         $this->assertSame(
-            'Yii Symfony Legacy Test',
+            'Yii Symfony Sleep Payload Test',
             $unserializedMessage->getSubject(),
             'Subject must be restored.',
         );
@@ -536,18 +536,18 @@ final class MessageTest extends TestCase
             'Charset must be restored.',
         );
         $this->assertStringContainsString(
-            'Subject: Yii Symfony Legacy Test',
+            'Subject: Yii Symfony Sleep Payload Test',
             $unserializedMessage->toString(),
             'Restored message must be renderable.',
         );
     }
 
-    public function testUnserializePrefersCurrentKeysOverLegacyKeys(): void
+    public function testUnserializePrefersPlainKeysOverMangledKeys(): void
     {
-        $legacyPrefix = "\0" . Message::class . "\0";
+        $mangledPrefix = "\0" . Message::class . "\0";
 
         $email = (new Email())->subject('Yii Symfony Current Test');
-        $legacyEmail = (new Email())->subject('Yii Symfony Legacy Test');
+        $mangledEmail = (new Email())->subject('Yii Symfony Mangled Test');
 
         $message = new Message();
 
@@ -555,8 +555,8 @@ final class MessageTest extends TestCase
             [
                 'email' => $email,
                 'charset' => 'iso-8859-1',
-                "{$legacyPrefix}email" => $legacyEmail,
-                "{$legacyPrefix}charset" => 'windows-1251',
+                "{$mangledPrefix}email" => $mangledEmail,
+                "{$mangledPrefix}charset" => 'windows-1251',
             ],
         );
 
@@ -598,6 +598,7 @@ final class MessageTest extends TestCase
         $missingCharset = 'Unable to unserialize '
             . Message::class
             . ": the payload does not contain a 'string' charset.";
+        $mangledPrefix = "\0" . Message::class . "\0";
 
         return [
             'missing email' => [
@@ -616,6 +617,14 @@ final class MessageTest extends TestCase
                 ['email' => new Email(), 'charset' => 1],
                 $missingCharset,
             ],
+            'null email with a valid mangled email' => [
+                ['email' => null, 'charset' => 'utf-8', "{$mangledPrefix}email" => new Email()],
+                $missingEmail,
+            ],
+            'null charset with a valid mangled charset' => [
+                ['email' => new Email(), 'charset' => null, "{$mangledPrefix}charset" => 'utf-8'],
+                $missingCharset,
+            ],
         ];
     }
 
@@ -627,7 +636,7 @@ final class MessageTest extends TestCase
      *
      * @return string serialized message payload.
      */
-    private function createLegacySerializedMessage(Email $email, string $charset): string
+    private function createSleepSerializedMessage(Email $email, string $charset): string
     {
         $class = Message::class;
         $emailKey = "\0" . $class . "\0email";

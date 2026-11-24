@@ -108,7 +108,7 @@ class Message extends BaseMessage implements MessageWrapperInterface
      * Restores the message from the data returned by {@see __serialize()}.
      *
      * Also accepts payloads written by earlier versions that used `__sleep()`, whose keys are the mangled names of the
-     * private properties. When a payload holds both forms, the current keys take precedence.
+     * private properties. A mangled name is read only when the payload has no plain key for that property.
      *
      * Unknown keys are ignored, so a subclass can call `parent::__unserialize($data)` with the whole payload and then
      * read its own keys.
@@ -119,26 +119,27 @@ class Message extends BaseMessage implements MessageWrapperInterface
      */
     public function __unserialize(array $data): void
     {
-        $legacyPrefix = "\0" . self::class . "\0";
+        $mangledPrefix = "\0" . self::class . "\0";
 
-        $email = $data['email'] ?? $data["{$legacyPrefix}email"] ?? null;
+        $data += [
+            'email' => $data["{$mangledPrefix}email"] ?? null,
+            'charset' => $data["{$mangledPrefix}charset"] ?? null,
+        ];
 
-        if (!$email instanceof Email) {
+        if (!$data['email'] instanceof Email) {
             throw new UnexpectedValueException(
                 'Unable to unserialize ' . static::class . ': the payload does not contain a Symfony email instance.',
             );
         }
 
-        $charset = $data['charset'] ?? $data["{$legacyPrefix}charset"] ?? null;
-
-        if (!is_string($charset)) {
+        if (!is_string($data['charset'])) {
             throw new UnexpectedValueException(
                 'Unable to unserialize ' . static::class . ": the payload does not contain a 'string' charset.",
             );
         }
 
-        $this->email = $email;
-        $this->charset = $charset;
+        $this->email = $data['email'];
+        $this->charset = $data['charset'];
     }
 
     public function getCharset(): string
