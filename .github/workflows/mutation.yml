@@ -9,7 +9,6 @@ on:
       - 'CHANGELOG.md'
       - '.gitignore'
       - '.gitattributes'
-      - 'psalm.xml'
 
   push:
     paths-ignore:
@@ -18,18 +17,14 @@ on:
       - 'CHANGELOG.md'
       - '.gitignore'
       - '.gitattributes'
-      - 'psalm.xml'
 
 name: mutation test
 
 jobs:
   mutation:
-    uses: yiisoft/actions/.github/workflows/roave-infection.yml@master
+    uses: yiisoft/yii2-actions/.github/workflows/infection.yml@master
     secrets:
       STRYKER_DASHBOARD_API_KEY: ${{ secrets.STRYKER_DASHBOARD_API_KEY }}
     with:
-      extensions: runkit7
-      os: >-
-        ['ubuntu-latest']
-      php: >-
-        ['8.1']
+      phpstan: true
+      php-version: "[8.3]"

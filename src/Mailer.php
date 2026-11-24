@@ -17,17 +17,6 @@ use Symfony\Component\Mailer\Transport\NullTransportFactory;
 use Symfony\Component\Mailer\Transport\SendmailTransportFactory;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransportFactory;
 use Symfony\Component\Mailer\Transport\TransportInterface;
-use Symfony\Component\Mailer\Bridge\Amazon\Transport\SesTransportFactory;
-use Symfony\Component\Mailer\Bridge\Azure\Transport\AzureTransportFactory;
-use Symfony\Component\Mailer\Bridge\Google\Transport\GmailTransportFactory;
-use Symfony\Component\Mailer\Bridge\Infobip\Transport\InfobipTransportFactory;
-use Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillTransportFactory;
-use Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory;
-use Symfony\Component\Mailer\Bridge\Mailjet\Transport\MailjetTransportFactory;
-use Symfony\Component\Mailer\Bridge\OhMySmtp\Transport\OhMySmtpTransportFactory;
-use Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory;
-use Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory;
-use Symfony\Component\Mailer\Bridge\Sendinblue\Transport\SendinblueTransportFactory;
 use Yii;
 use yii\base\InvalidArgumentException;
 use yii\base\InvalidConfigException;
@@ -86,8 +75,6 @@ class Mailer extends BaseMailer
     }
 
     /**
-     * @psalm-suppress UndefinedClass
-     * @psalm-suppress RedundantConditionGivenDocblockType
      * @throws InvalidConfigException
      * @throws \yii\di\NotInstantiableException
      */
@@ -98,27 +85,29 @@ class Mailer extends BaseMailer
         }
 
         // Use the Yii DI container, if available.
-        if (isset(Yii::$container)) {
-            $factories = [];
-            foreach (
-                [
+        if (Yii::$container !== null) {
+            // Optional bridges are referenced by name, since their packages may not be installed.
+            $factoryClasses = [
                 NullTransportFactory::class,
                 SendmailTransportFactory::class,
                 EsmtpTransportFactory::class,
                 NativeTransportFactory::class,
-                SesTransportFactory::class,
-                AzureTransportFactory::class,
-                GmailTransportFactory::class,
-                InfobipTransportFactory::class,
-                MandrillTransportFactory::class,
-                MailgunTransportFactory::class,
-                MailjetTransportFactory::class,
-                OhMySmtpTransportFactory::class,
-                PostmarkTransportFactory::class,
-                SendgridTransportFactory::class,
-                SendinblueTransportFactory::class,
-                ] as $factoryClass
-            ) {
+                'Symfony\Component\Mailer\Bridge\Amazon\Transport\SesTransportFactory',
+                'Symfony\Component\Mailer\Bridge\Azure\Transport\AzureTransportFactory',
+                'Symfony\Component\Mailer\Bridge\Google\Transport\GmailTransportFactory',
+                'Symfony\Component\Mailer\Bridge\Infobip\Transport\InfobipTransportFactory',
+                'Symfony\Component\Mailer\Bridge\Mailchimp\Transport\MandrillTransportFactory',
+                'Symfony\Component\Mailer\Bridge\Mailgun\Transport\MailgunTransportFactory',
+                'Symfony\Component\Mailer\Bridge\Mailjet\Transport\MailjetTransportFactory',
+                'Symfony\Component\Mailer\Bridge\OhMySmtp\Transport\OhMySmtpTransportFactory',
+                'Symfony\Component\Mailer\Bridge\Postmark\Transport\PostmarkTransportFactory',
+                'Symfony\Component\Mailer\Bridge\Sendgrid\Transport\SendgridTransportFactory',
+                'Symfony\Component\Mailer\Bridge\Sendinblue\Transport\SendinblueTransportFactory',
+            ];
+
+            $factories = [];
+
+            foreach ($factoryClasses as $factoryClass) {
                 if (!class_exists($factoryClass)) {
                     continue;
                 }

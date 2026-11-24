@@ -25,10 +25,8 @@ on:
 name: static analysis
 
 jobs:
-  psalm:
-    uses: yiisoft/actions/.github/workflows/psalm.yml@master
+  phpstan:
+    uses: yiisoft/yii2-actions/.github/workflows/phpstan.yml@master
     with:
-      os: >-
-        ['ubuntu-latest']
-      php: >-
-        ['8.1']
+      configuration: phpstan.neon
+      php-version: "[8.1]"
