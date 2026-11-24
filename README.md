@@ -89,6 +89,69 @@ DI Container
 The `Mailer` component will automatically use the DI container when it is available.
 This allows you to easily override the transport factory configurations or their dependencies.
 
+Serializing messages
+--------------------
+
+A message can be passed to PHP's `serialize()` function, for example to store it or to hand it to a queue job, and sent after it is restored with `unserialize()`:
+
+```php
+$message = Yii::$app->mailer->compose('contact/html')
+    ->setFrom('from@domain.com')
+    ->setTo($form->email)
+    ->setSubject($form->subject);
+
+$payload = serialize($message);
+// Later, possibly in another process.
+$message = unserialize($payload);
+
+$message->send();
+```
+
+The payload holds the Symfony email and the charset. The `mailer` property is not serialized, so a restored message is sent through the `mailer` application component unless you pass a mailer to `send()`.
+
+> [!IMPORTANT]
+> - Only unserialize payloads that come from a trusted source.
+> - Files added with `attach()` or `embed()` are stored as a path and read when the message is sent, so the file must still exist at that path. Content added with `attachContent()` or `embedContent()` is stored in the payload.
+
+### Extending the message class
+
+A class that extends `Message` without adding state is serialized as is. A class that adds its own state must include it in the payload: override `__serialize()` and `__unserialize()`, and call the parent implementation in both.
+
+```php
+namespace app\mail;
+
+use yii\symfonymailer\Message;
+
+final class TenantMessage extends Message
+{
+    public string $tenant = '';
+
+    public function __serialize(): array
+    {
+        return parent::__serialize() + ['tenant' => $this->tenant];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        parent::__unserialize($data);
+
+        $this->tenant = $data['tenant'];
+    }
+}
+```
+
+Then set the class in the mailer configuration:
+
+```php
+'mailer' => [
+    'class' => \yii\symfonymailer\Mailer::class,
+    'messageClass' => \app\mail\TenantMessage::class,
+],
+```
+
+> [!NOTE]
+> Earlier versions of this extension used `__sleep()`. Payloads written by those versions for the `Message` class can still be unserialized. A subclass that overrides `__sleep()` must move to `__serialize()` and `__unserialize()`, because PHP no longer calls `__sleep()` on it.
+
 Migrating from yiisoft/yii2-swiftmailer
 ---------------------------------------
 
