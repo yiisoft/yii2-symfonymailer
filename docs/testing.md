@@ -22,7 +22,13 @@ composer run ecs
 
 ## Mutation testing
 
-Mutation testing is checked with [Infection](https://infection.github.io/). To run it:
+With [Infection](https://infection.github.io/) 0.32 (PHP 8.3 or later), run mutation testing with PHPStan as CI does:
+
+```shell
+composer run mutation -- --static-analysis-tool=phpstan
+```
+
+With Infection 0.27 on PHP 8.1, run mutation testing without static analysis:
 
 ```shell
 composer run mutation
@@ -30,10 +36,10 @@ composer run mutation
 
 ## Static analysis
 
-The code is statically analyzed with [Psalm](https://psalm.dev/). To run static analysis:
+The code is statically analyzed with [PHPStan](https://phpstan.org/). To run static analysis:
 
 ```shell
-composer run psalm
+composer run static
 ```
 
 ## Unit tests

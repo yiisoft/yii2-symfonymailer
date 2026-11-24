@@ -399,7 +399,7 @@ class Message extends BaseMessage implements MessageWrapperInterface
     /**
      * Converts address instances to their string representations.
      *
-     * @param list<Address> $addresses
+     * @param array<Address> $addresses
      *
      * @return array<string, string>|string
      */
