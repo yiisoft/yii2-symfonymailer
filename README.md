@@ -154,7 +154,12 @@ Then set the class in the mailer configuration:
 Version 5.0 replaces `Message::__sleep()` with `__serialize()` and `__unserialize()`.
 
 - Payloads written by earlier versions for the `Message` class can still be unserialized.
-- A subclass that defines `__sleep()` or `__wakeup()` must move that logic to `__serialize()` and `__unserialize()`. PHP no longer calls the old methods, so the state they handled is not serialized or restored.
+- If a subclass defines `__sleep()` or `__wakeup()`, move that logic to `__serialize()` and `__unserialize()`.
+  PHP no longer calls the old hooks, and the base implementation does not restore subclass state.
+- If a subclass already implements the new hooks, make sure its signatures are compatible with
+  `__serialize(): array` and `__unserialize(array $data): void`.
+- If subclass messages are already queued, drain them with 4.x workers before upgrading, or make the subclass's
+  `__unserialize()` read its state from both the old and new payload formats.
 
 Migrating from yiisoft/yii2-swiftmailer
 ---------------------------------------

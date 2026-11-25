@@ -4,7 +4,7 @@ Yii Framework 2 Symfony mailer extension Change Log
 5.0.0 under development
 -----------------------
 
-- Bug #82: Fix `Message` subclass serialization by replacing `__sleep()` with `__serialize()` and `__unserialize()` (BC break) (terabytesoftw)
+- Chg #82: Fix `Message` subclass serialization with `__serialize()` and `__unserialize()` (BC break) (terabytesoftw)
 - Bug #91, #93: Add the missing `@property` tags (mspirkov)
 - Enh #80: Add support for Azure Email Communication Services (bijoys)
 - Enh #81: Remove unnecessary files from Composer package (s1lver)
