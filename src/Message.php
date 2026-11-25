@@ -21,9 +21,11 @@ use DateTimeInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Header\HeaderInterface;
+use UnexpectedValueException;
 use yii\base\InvalidConfigException;
 use yii\helpers\FileHelper;
 use yii\mail\BaseMessage;
+use function is_string;
 
 /**
  * @psalm-suppress PropertyNotSetInConstructor
@@ -77,6 +79,7 @@ class Message extends BaseMessage implements MessageWrapperInterface
     public function __construct(array $config = [])
     {
         $this->email = new Email();
+
         parent::__construct($config);
     }
 
@@ -85,9 +88,58 @@ class Message extends BaseMessage implements MessageWrapperInterface
         $this->email = clone $this->email;
     }
 
-    public function __sleep(): array
+    /**
+     * Returns the data stored when the message is serialized.
+     *
+     * The payload holds the Symfony email and the charset. The {@see \yii\mail\BaseMessage::$mailer} property is not
+     * included, so an unserialized message has no mailer assigned.
+     *
+     * A subclass that adds its own state extends the payload with its own keys, for example
+     * `return parent::__serialize() + ['tenant' => $this->tenant];`, and reads them back in {@see __unserialize()}.
+     *
+     * @return array<string, mixed> Message data keyed by property name.
+     */
+    public function __serialize(): array
     {
-        return ['email', 'charset'];
+        return ['email' => $this->email, 'charset' => $this->charset];
+    }
+
+    /**
+     * Restores the message from the data returned by {@see __serialize()}.
+     *
+     * Also accepts payloads written by earlier versions that used `__sleep()`, whose keys are the mangled names of the
+     * private properties. A mangled name is read only when the payload has no plain key for that property.
+     *
+     * Unknown keys are ignored, so a subclass can call `parent::__unserialize($data)` with the whole payload and then
+     * read its own keys.
+     *
+     * @param array<string, mixed> $data Message data produced by serialization.
+     *
+     * @throws UnexpectedValueException if the payload does not contain an {@see Email} instance or a `string` charset.
+     */
+    public function __unserialize(array $data): void
+    {
+        $mangledPrefix = "\0" . self::class . "\0";
+
+        $data += [
+            'email' => $data["{$mangledPrefix}email"] ?? null,
+            'charset' => $data["{$mangledPrefix}charset"] ?? null,
+        ];
+
+        if (!$data['email'] instanceof Email) {
+            throw new UnexpectedValueException(
+                'Unable to unserialize ' . static::class . ': the payload does not contain a Symfony email instance.',
+            );
+        }
+
+        if (!is_string($data['charset'])) {
+            throw new UnexpectedValueException(
+                'Unable to unserialize ' . static::class . ": the payload does not contain a 'string' charset.",
+            );
+        }
+
+        $this->email = $data['email'];
+        $this->charset = $data['charset'];
     }
 
     public function getCharset(): string

@@ -10,11 +10,15 @@ declare(strict_types=1);
 
 namespace yiiunit\extensions\symfonymailer;
 
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Part\DataPart;
+use UnexpectedValueException;
 use Yii;
 use yii\helpers\FileHelper;
 use yii\symfonymailer\Mailer;
 use yii\symfonymailer\Message;
+use yiiunit\extensions\symfonymailer\support\SubclassedMessage;
+use yiiunit\extensions\symfonymailer\support\TenantAwareMessage;
 
 // phpcs:disable PSR1.Files.SideEffects.FoundWithSymbols
 Yii::setAlias('@yii/symfonymailer', __DIR__ . '/../../../../extensions/symfonymailer');
@@ -92,7 +96,6 @@ final class MessageTest extends TestCase
         $textColor = imagecolorallocate($image, 233, 14, 91);
         imagestring($image, 1, 5, 5, $text, $textColor);
         imagejpeg($image, $fileFullName);
-        imagedestroy($image);
 
         return $fileFullName;
     }
@@ -352,6 +355,304 @@ final class MessageTest extends TestCase
 
         $unserializedMessage = unserialize(serialize($message));
         $this->assertNull($unserializedMessage->mailer);
+    }
+
+    public function testSendUnserializedMessageThroughApplicationMailer(): void
+    {
+        $message = $this->createTestMessage();
+
+        $message->setTo($this->testEmailReceiver);
+        $message->setFrom('someuser@somedomain.com');
+        $message->setSubject('Yii Symfony Restored Message Test');
+        $message->setTextBody('Yii Symfony restored message plain text body');
+
+        $unserializedMessage = unserialize(serialize($message));
+
+        $this->assertNull(
+            $unserializedMessage->mailer,
+            'Restored message must have no mailer assigned.',
+        );
+        $this->assertTrue(
+            $unserializedMessage->send(),
+            'Application mailer must send the message.',
+        );
+    }
+
+    public function testSerializePayloadContainsOnlyEmailAndCharset(): void
+    {
+        $message = $this->createTestMessage();
+
+        $message->setCharset('iso-8859-1');
+
+        $payload = $message->__serialize();
+
+        $this->assertSame(
+            ['email', 'charset'],
+            array_keys($payload),
+            'Payload keys must be exactly email and charset.',
+        );
+        $this->assertSame(
+            $message->getSymfonyEmail(),
+            $payload['email'],
+            'Payload must hold the Symfony email.',
+        );
+        $this->assertSame(
+            'iso-8859-1',
+            $payload['charset'],
+            'Payload must hold the charset.',
+        );
+    }
+
+    public function testSerializeSubclassWithoutOverrides(): void
+    {
+        $message = new SubclassedMessage();
+
+        $message->setTo($this->testEmailReceiver);
+        $message->setFrom('someuser@somedomain.com');
+        $message->setSubject('Yii Symfony Subclass Test');
+        $message->setTextBody('Yii Symfony subclass plain text body');
+
+        $warnings = [];
+
+        set_error_handler(
+            static function (int $errno, string $errstr) use (&$warnings): bool {
+                $warnings[] = $errstr;
+
+                return true;
+            },
+        );
+
+        try {
+            $serializedMessage = serialize($message);
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertSame([], $warnings, 'No PHP warning must be emitted.');
+
+        $unserializedMessage = unserialize($serializedMessage);
+
+        $this->assertInstanceOf(
+            SubclassedMessage::class,
+            $unserializedMessage,
+            'Subclass type must be preserved.',
+        );
+        $this->assertEquals(
+            $message->getSymfonyEmail(),
+            $unserializedMessage->getSymfonyEmail(),
+            'Symfony email must be restored.',
+        );
+        $this->assertSame(
+            'Yii Symfony Subclass Test',
+            $unserializedMessage->getSubject(),
+            'Subject must be preserved.',
+        );
+        $this->assertSame(
+            'utf-8',
+            $unserializedMessage->getCharset(),
+            'Charset must be preserved.',
+        );
+    }
+
+    public function testSerializeSubclassExtendingSerializationHooks(): void
+    {
+        $message = new TenantAwareMessage();
+
+        $message->tenant = 'acme';
+
+        $message->setTo($this->testEmailReceiver);
+        $message->setFrom('someuser@somedomain.com');
+        $message->setSubject('Yii Symfony Tenant Test');
+        $message->setTextBody('Yii Symfony tenant plain text body');
+
+        $unserializedMessage = unserialize(serialize($message));
+
+        $this->assertInstanceOf(
+            TenantAwareMessage::class,
+            $unserializedMessage,
+            'Subclass type must be preserved.',
+        );
+        $this->assertSame(
+            'acme',
+            $unserializedMessage->tenant,
+            'Subclass state must be restored.',
+        );
+        $this->assertEquals(
+            $message->getSymfonyEmail(),
+            $unserializedMessage->getSymfonyEmail(),
+            'Symfony email must be restored.',
+        );
+        $this->assertSame(
+            'utf-8',
+            $unserializedMessage->getCharset(),
+            'Charset must be preserved.',
+        );
+    }
+
+    public function testSerializePreservesNonDefaultCharset(): void
+    {
+        $message = $this->createTestMessage();
+
+        $message->setCharset('iso-8859-1');
+        $message->setTextBody('Yii Symfony charset plain text body');
+
+        $unserializedMessage = unserialize(serialize($message));
+
+        $this->assertSame(
+            'iso-8859-1',
+            $unserializedMessage->getCharset(),
+            "Charset must remain 'iso-8859-1'.",
+        );
+    }
+
+    public function testUnserializeSleepPayload(): void
+    {
+        $email = (new Email())
+            ->to($this->testEmailReceiver)
+            ->from('someuser@somedomain.com')
+            ->subject('Yii Symfony Sleep Payload Test')
+            ->text('Yii Symfony sleep payload plain text body', 'iso-8859-1');
+
+        $unserializedMessage = unserialize($this->createSleepSerializedMessage($email, 'iso-8859-1'));
+
+        $this->assertInstanceOf(
+            Message::class,
+            $unserializedMessage,
+            'Payload must restore a message.',
+        );
+        $this->assertEquals(
+            $email,
+            $unserializedMessage->getSymfonyEmail(),
+            'Symfony email must be restored.',
+        );
+        $this->assertSame(
+            'Yii Symfony Sleep Payload Test',
+            $unserializedMessage->getSubject(),
+            'Subject must be restored.',
+        );
+        $this->assertSame(
+            'iso-8859-1',
+            $unserializedMessage->getCharset(),
+            'Charset must be restored.',
+        );
+        $this->assertStringContainsString(
+            'Subject: Yii Symfony Sleep Payload Test',
+            $unserializedMessage->toString(),
+            'Restored message must be renderable.',
+        );
+    }
+
+    public function testUnserializePrefersPlainKeysOverMangledKeys(): void
+    {
+        $mangledPrefix = "\0" . Message::class . "\0";
+
+        $email = (new Email())->subject('Yii Symfony Current Test');
+        $mangledEmail = (new Email())->subject('Yii Symfony Mangled Test');
+
+        $message = new Message();
+
+        $message->__unserialize(
+            [
+                'email' => $email,
+                'charset' => 'iso-8859-1',
+                "{$mangledPrefix}email" => $mangledEmail,
+                "{$mangledPrefix}charset" => 'windows-1251',
+            ],
+        );
+
+        $this->assertSame(
+            $email,
+            $message->getSymfonyEmail(),
+            'Current email key must take precedence.',
+        );
+        $this->assertSame(
+            'iso-8859-1',
+            $message->getCharset(),
+            'Current charset key must take precedence.',
+        );
+    }
+
+    /**
+     * @dataProvider invalidSerializedPayloadProvider
+     *
+     * @param array<string, mixed> $data
+     */
+    public function testThrowUnexpectedValueExceptionForInvalidPayload(array $data, string $expectedMessage): void
+    {
+        $message = new Message();
+
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessage($expectedMessage);
+
+        $message->__unserialize($data);
+    }
+
+    /**
+     * @return array<string, array{array<string, mixed>, string}>
+     */
+    public static function invalidSerializedPayloadProvider(): array
+    {
+        $missingEmail = 'Unable to unserialize '
+            . Message::class
+            . ': the payload does not contain a Symfony email instance.';
+        $missingCharset = 'Unable to unserialize '
+            . Message::class
+            . ": the payload does not contain a 'string' charset.";
+        $mangledPrefix = "\0" . Message::class . "\0";
+
+        return [
+            'missing email' => [
+                ['charset' => 'utf-8'],
+                $missingEmail,
+            ],
+            'email of the wrong type' => [
+                ['email' => 'someuser@somedomain.com', 'charset' => 'utf-8'],
+                $missingEmail,
+            ],
+            'missing charset' => [
+                ['email' => new Email()],
+                $missingCharset,
+            ],
+            'charset of the wrong type' => [
+                ['email' => new Email(), 'charset' => 1],
+                $missingCharset,
+            ],
+            'null email with a valid mangled email' => [
+                ['email' => null, 'charset' => 'utf-8', "{$mangledPrefix}email" => new Email()],
+                $missingEmail,
+            ],
+            'null charset with a valid mangled charset' => [
+                ['email' => new Email(), 'charset' => null, "{$mangledPrefix}charset" => 'utf-8'],
+                $missingCharset,
+            ],
+        ];
+    }
+
+    /**
+     * Builds a serialized message in the format written by the former `__sleep()` implementation.
+     *
+     * @param Email $email Symfony email stored under the mangled private property name.
+     * @param string $charset charset stored under the mangled private property name.
+     *
+     * @return string serialized message payload.
+     */
+    private function createSleepSerializedMessage(Email $email, string $charset): string
+    {
+        $class = Message::class;
+        $emailKey = "\0" . $class . "\0email";
+        $charsetKey = "\0" . $class . "\0charset";
+
+        return sprintf(
+            'O:%d:"%s":2:{s:%d:"%s";%ss:%d:"%s";%s}',
+            strlen($class),
+            $class,
+            strlen($emailKey),
+            $emailKey,
+            serialize($email),
+            strlen($charsetKey),
+            $charsetKey,
+            serialize($charset),
+        );
     }
 
     /**
